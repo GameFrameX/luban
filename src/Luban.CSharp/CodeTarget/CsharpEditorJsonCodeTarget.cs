@@ -41,31 +41,24 @@ public class CsharpEditorJsonCodeTarget : CsharpCodeTargetBase
         }
     }
 
-    private string TopModule => EnvManager.Current.GetOptionOrDefault("editor", "topModule", true, "editor.cfg");
-
-    private string MakeNameWithTopModule(string name)
-    {
-        return TypeUtil.MakeFullName(TopModule, name);
-    }
-
     public override void GenerateBean(GenerationContext ctx, DefBean bean, CodeWriter writer)
     {
         var template = GetTemplate("bean");
         var tplCtx = CreateTemplateContext(template);
         var extraEnvs = new ScriptObject
         {
-            { "__ctx", ctx},
-            { "__top_module", TopModule },
+            { "__ctx", ctx },
+            { "__top_module", GenerationContext.Current.TopModule },
             { "__name", bean.Name },
             { "__namespace", bean.Namespace },
-            { "__namespace_with_top_module", MakeNameWithTopModule(bean.Namespace) },
-            { "__full_name_with_top_module", MakeNameWithTopModule(bean.FullName) },
+            { "__namespace_with_top_module", bean.NamespaceWithTopModule },
+            { "__full_name_with_top_module", bean.FullNameWithTopModule },
             { "__bean", bean },
             { "__this", bean },
-            {"__fields", bean.Fields},
-            {"__hierarchy_fields", bean.HierarchyFields},
-            {"__parent_def_type", bean.ParentDefType},
-            { "__code_style", CodeStyle},
+            { "__fields", bean.Fields },
+            { "__hierarchy_fields", bean.HierarchyFields },
+            { "__parent_def_type", bean.ParentDefType },
+            { "__code_style", CodeStyle },
         };
         tplCtx.PushGlobal(extraEnvs);
         writer.Write(template.Render(tplCtx));
@@ -77,15 +70,15 @@ public class CsharpEditorJsonCodeTarget : CsharpCodeTargetBase
         var tplCtx = CreateTemplateContext(template);
         var extraEnvs = new ScriptObject
         {
-            { "__ctx", ctx},
+            { "__ctx", ctx },
             { "__name", @enum.Name },
             { "__namespace", @enum.Namespace },
-            { "__top_module", TopModule },
-            { "__namespace_with_top_module", MakeNameWithTopModule(@enum.Namespace) },
-            { "__full_name_with_top_module", MakeNameWithTopModule(@enum.FullName) },
+            { "__top_module", GenerationContext.Current.TopModule },
+            { "__namespace_with_top_module", @enum.NamespaceWithTopModule },
+            { "__full_name_with_top_module", @enum.FullNameWithTopModule },
             { "__enum", @enum },
             { "__this", @enum },
-            { "__code_style", CodeStyle},
+            { "__code_style", CodeStyle },
         };
         tplCtx.PushGlobal(extraEnvs);
         writer.Write(template.Render(tplCtx));
