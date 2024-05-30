@@ -45,6 +45,7 @@ public class CsharpEditorJsonCodeTarget : CsharpCodeTargetBase
     {
         var template = GetTemplate("bean");
         var tplCtx = CreateTemplateContext(template);
+        string topModule = ctx.Target.TopModule;
         var extraEnvs = new ScriptObject
         {
             { "__ctx", ctx },
@@ -68,6 +69,7 @@ public class CsharpEditorJsonCodeTarget : CsharpCodeTargetBase
     {
         var template = GetTemplate("enum");
         var tplCtx = CreateTemplateContext(template);
+        string topModule = ctx.Target.TopModule;
         var extraEnvs = new ScriptObject
         {
             { "__ctx", ctx },

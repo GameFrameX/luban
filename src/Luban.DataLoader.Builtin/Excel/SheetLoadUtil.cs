@@ -159,7 +159,7 @@ public static class SheetLoadUtil
             {
                 break;
             }
-            string rowTag = row[0].Value?.ToString()?.ToLower() ?? "";
+            string rowTag = row[0].Value?.ToString()?.ToLower()?.Trim() ?? "";
             if (!rowTag.StartsWith("##"))
             {
                 break;
@@ -194,7 +194,7 @@ public static class SheetLoadUtil
             {
                 break;
             }
-            string rowTag = row[0].Value?.ToString()?.ToLower() ?? "";
+            string rowTag = row[0].Value?.ToString()?.ToLower()?.Trim() ?? "";
             if (rowTag == "##field" || rowTag == "##var" || rowTag == "##+")
             {
                 rowIndex = i;
@@ -468,6 +468,13 @@ public static class SheetLoadUtil
         return s == tag;
     }
 
+    private static bool IsEmptyRow(List<Cell> row)
+    {
+        return row.All(c => string.IsNullOrWhiteSpace(c.Value?.ToString()));
+    }
+
+    const int maxEmptyRowCountOfInterruptParse = 10;
+
     private static List<List<Cell>> ParseRawSheetContent(IExcelDataReader reader, bool orientRow, bool headerOnly)
     {
         // TODO 优化性能
@@ -477,6 +484,7 @@ public static class SheetLoadUtil
         // 3. 跳过null或者empty的单元格
         var originRows = new List<List<Cell>>();
         int rowIndex = 0;
+        int consecutiveEmptyRowCount = 0;
         do
         {
             var row = new List<Cell>();
@@ -490,6 +498,19 @@ public static class SheetLoadUtil
                 break;
             }
             ++rowIndex;
+            if (IsEmptyRow(row))
+            {
+                ++consecutiveEmptyRowCount;
+                if (consecutiveEmptyRowCount > maxEmptyRowCountOfInterruptParse)
+                {
+                    s_logger.Error("excel:{filename} sheet:{sheet} 连续空行超过{}行，可能是数据错误，解析中断", s_curExcel.Value, reader.Name, maxEmptyRowCountOfInterruptParse);
+                    break;
+                }
+            }
+            else
+            {
+                consecutiveEmptyRowCount = 0;
+            }
         } while (reader.Read());
 
         List<List<Cell>> finalRows;

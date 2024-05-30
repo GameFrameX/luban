@@ -13,7 +13,7 @@ public class TEnum : TType
 
     public override string TypeName => "enum";
 
-    public bool IsEnum => true;
+    public override bool IsEnum => true;
 
     public DefEnum DefEnum { get; }
 
@@ -55,5 +55,10 @@ public class TEnum : TType
     public override TR Apply<T1, T2, T3, TR>(ITypeFuncVisitor<T1, T2, T3, TR> visitor, T1 x, T2 y, T3 z)
     {
         return visitor.Accept(this, x, y, z);
+    }
+
+    public override TR Apply<T1, T2, T3, T4, TR>(ITypeFuncVisitor<T1, T2, T3, T4, TR> visitor, T1 x, T2 y, T3 z, T4 w)
+    {
+        return visitor.Accept(this, x, y, z, w);
     }
 }
