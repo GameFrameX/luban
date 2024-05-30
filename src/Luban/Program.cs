@@ -1,17 +1,9 @@
 ﻿using CommandLine;
-using Luban.CSharp;
-using Luban.DataExporter.Builtin;
-using Luban.DataLoader.Builtin;
 using Luban.DataLoader.Builtin.DataVisitors;
-using Luban.DataValidator.Builtin.Collection;
-using Luban.L10N;
 using Luban.Pipeline;
-using Luban.Protobuf.TypeVisitors;
-using Luban.Schema.Builtin;
 using Luban.Tmpl;
 using Luban.Utils;
 using NLog;
-using System.Reflection;
 using System.Text;
 
 namespace Luban;
@@ -75,7 +67,7 @@ internal static class Program
 
     private static void Main(string[] args)
     {
-        CommandOptions opts = ParseArgs(args);
+        var opts = ParseArgs(args);
         SetupApp(opts);
 
         try
