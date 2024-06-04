@@ -33,6 +33,8 @@ public interface ITypeActionVisitor<T>
     void Accept(TSet type, T x);
 
     void Accept(TMap type, T x);
+
+    void Accept(TLang type, T x);
 }
 
 public interface ITypeActionVisitor<T1, T2>
@@ -54,6 +56,8 @@ public interface ITypeActionVisitor<T1, T2>
     void Accept(TEnum type, T1 x, T2 y);
 
     void Accept(TString type, T1 x, T2 y);
+
+    void Accept(TLang type, T1 x, T2 y);
 
     void Accept(TDateTime type, T1 x, T2 y);
 

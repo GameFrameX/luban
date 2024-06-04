@@ -80,4 +80,9 @@ public class RawDefineTypeNameVisitor : ITypeFuncVisitor<string>
     {
         return $"map,{type.KeyType.Apply(this)},{type.ValueType.Apply(this)}";
     }
+
+    public string Accept(TLang type)
+    {
+        return "lang";
+    }
 }

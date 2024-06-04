@@ -102,6 +102,7 @@ public class DefAssembly
         {
             type.PreCompile();
         }
+
         foreach (var type in TypeList)
         {
             type.Compile();
@@ -119,6 +120,7 @@ public class DefAssembly
         {
             return true;
         }
+
         return groups.Any(g => Target.Groups.Contains(g));
     }
 
@@ -138,6 +140,7 @@ public class DefAssembly
         {
             throw new Exception($"table:'{table.FullName}' duplicated");
         }
+
         if (!TablesByName.TryAdd(table.Name, table))
         {
             throw new Exception($"table:'{table.FullName} 与 table:'{TablesByName[table.Name].FullName}' 的表名重复(不同模块下也不允许定义同名表，将来可能会放开限制)");
@@ -161,6 +164,7 @@ public class DefAssembly
         {
             throw new Exception($"refgroup:{g.Name} 重复");
         }
+
         _refGroups.Add(g.Name, new DefRefGroup(g));
     }
 
@@ -299,6 +303,7 @@ public class DefAssembly
                 {
                     throw new Exception($"container element type can't be nullable type:'{module}.{type}'");
                 }
+
                 nullable = true;
                 type = type[..^1];
                 continue;
@@ -310,6 +315,7 @@ public class DefAssembly
                 type = type[..^1];
                 continue;
             }
+
             break;
         }
 
@@ -344,6 +350,11 @@ public class DefAssembly
                 return TDouble.Create(nullable, tags);
             case "string":
                 return TString.Create(nullable, tags);
+            case "lang":
+            {
+                tags.Add("lang", "1");
+                return TLang.Create(nullable, tags);
+            }
             case "text":
                 tags.Add("text", "1");
                 return TString.Create(nullable, tags);
@@ -372,6 +383,7 @@ public class DefAssembly
         {
             throw new ArgumentException($"invalid map element type:'{keyValueType}'");
         }
+
         return TMap.Create(false, tags,
             CreateNotContainerType(module, keyValueType.Substring(0, typeSepIndex).Trim(), true),
             CreateType(module, keyValueType.Substring(typeSepIndex + 1).Trim(), true), isTreeMap);
@@ -394,6 +406,7 @@ public class DefAssembly
                 {
                     throw new Exception("set的元素不支持容器类型");
                 }
+
                 return TSet.Create(false, containerTags, type, false);
             }
             case "map":

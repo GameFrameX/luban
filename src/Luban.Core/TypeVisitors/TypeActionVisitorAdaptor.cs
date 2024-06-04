@@ -74,6 +74,11 @@ public abstract class TypeActionVisitorAdaptor<T> : ITypeActionVisitor<T>
 
     }
 
+    public virtual void Accept(TLang type, T x)
+    {
+
+    }
+
     public virtual void Accept(TDateTime type, T x)
     {
 

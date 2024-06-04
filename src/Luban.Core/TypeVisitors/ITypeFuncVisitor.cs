@@ -33,6 +33,8 @@ public interface ITypeFuncVisitor<TR>
     TR Accept(TSet type);
 
     TR Accept(TMap type);
+
+    TR Accept(TLang type);
 }
 
 public interface ITypeFuncVisitor<T, TR>
@@ -66,6 +68,8 @@ public interface ITypeFuncVisitor<T, TR>
     TR Accept(TSet type, T x);
 
     TR Accept(TMap type, T x);
+
+    TR Accept(TLang type, T x);
 }
 
 public interface ITypeFuncVisitor<T, T2, TR>
@@ -99,6 +103,8 @@ public interface ITypeFuncVisitor<T, T2, TR>
     TR Accept(TSet type, T x, T2 y);
 
     TR Accept(TMap type, T x, T2 y);
+
+    TR Accept(TLang type, T x, T2 y);
 }
 
 public interface ITypeFuncVisitor<T, T2, T3, TR>
@@ -132,6 +138,8 @@ public interface ITypeFuncVisitor<T, T2, T3, TR>
     TR Accept(TSet type, T x, T2 y, T3 z);
 
     TR Accept(TMap type, T x, T2 y, T3 z);
+
+    TR Accept(TLang type, T x, T2 y, T3 z);
 }
 
 public interface ITypeFuncVisitor<T, T2, T3, T4, TR>
@@ -165,4 +173,6 @@ public interface ITypeFuncVisitor<T, T2, T3, T4, TR>
     TR Accept(TSet type, T x, T2 y, T3 z, T4 w);
 
     TR Accept(TMap type, T x, T2 y, T3 z, T4 w);
+
+    TR Accept(TLang type, T x, T2 y, T3 z, T4 w);
 }

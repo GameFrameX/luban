@@ -14,6 +14,7 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
         {
             return false;
         }
+
         if (!a.Namespace.Equals(b.Namespace))
         {
             return false;
@@ -28,14 +29,17 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
         {
             return false;
         }
+
         if (a.IsMultiRow != b.IsMultiRow)
         {
             return false;
         }
+
         if (a.Sep != b.Sep)
         {
             return false;
         }
+
         return true;
     }
 
@@ -51,6 +55,7 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
         {
             return e;
         }
+
         if (inWalk.Contains(a))
         {
             return true;
@@ -95,6 +100,7 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
             {
                 return setupNotEqual();
             }
+
             if (a.Children == null)
             {
                 if (b.Children != null)
@@ -189,6 +195,7 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
         {
             return false;
         }
+
         for (int i = 0; i < a.Count; i++)
         {
             var ia = a[i];
@@ -198,10 +205,16 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
                 return false;
             }
         }
+
         return true;
     }
 
     public bool Accept(TString type, TType x, Dictionary<DefTypeBase, bool> y, HashSet<DefTypeBase> z)
+    {
+        return true;
+    }
+
+    public bool Accept(TLang type, TType x, Dictionary<DefTypeBase, bool> y, HashSet<DefTypeBase> z)
     {
         return true;
     }

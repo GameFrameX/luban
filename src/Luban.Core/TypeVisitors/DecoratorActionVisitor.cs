@@ -81,11 +81,14 @@ public abstract class DecoratorActionVisitor<T> : ITypeActionVisitor<T>
         DoAccept(type, x);
     }
 
+    public void Accept(TLang type, T x)
+    {
+        DoAccept(type, x);
+    }
 }
 
 public abstract class DecoratorActionVisitor<T1, T2> : ITypeActionVisitor<T1, T2>
 {
-
     public abstract void DoAccept(TType type, T1 x, T2 y);
 
     public virtual void Accept(TBool type, T1 x, T2 y)
@@ -129,6 +132,11 @@ public abstract class DecoratorActionVisitor<T1, T2> : ITypeActionVisitor<T1, T2
     }
 
     public virtual void Accept(TString type, T1 x, T2 y)
+    {
+        DoAccept(type, x, y);
+    }
+
+    public void Accept(TLang type, T1 x, T2 y)
     {
         DoAccept(type, x, y);
     }

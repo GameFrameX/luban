@@ -101,4 +101,9 @@ class RefTypeVisitor : ITypeActionVisitor<Dictionary<string, DefTypeBase>>
         type.KeyType.Apply(this, x);
         type.ValueType.Apply(this, x);
     }
+
+    public void Accept(TLang type, Dictionary<string, DefTypeBase> x)
+    {
+        
+    }
 }
