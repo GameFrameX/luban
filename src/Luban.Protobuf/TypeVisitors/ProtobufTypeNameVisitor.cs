@@ -53,6 +53,11 @@ public class ProtobufTypeNameVisitor : ITypeFuncVisitor<string>
         return "string";
     }
 
+    public string Accept(TLang type)
+    {
+        return "string";
+    }
+
     public string Accept(TDateTime type)
     {
         return "int64";

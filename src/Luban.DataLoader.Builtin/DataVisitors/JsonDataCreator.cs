@@ -56,6 +56,11 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
         return DString.ValueOf(type, x.GetString());
     }
 
+    public DType Accept(TLang type, JsonElement x, DefAssembly y)
+    {
+        return DString.ValueOf(type, x.GetString());
+    }
+
     public DType Accept(TBean type, JsonElement x, DefAssembly ass)
     {
         var bean = type.DefBean;
@@ -67,6 +72,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
             {
                 throw new Exception($"结构:'{bean.FullName}' 是多态类型，必须用 '{FieldNames.JsonTypeNameKey}' 字段指定 子类名");
             }
+
             string subType = typeNameProp.GetString();
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
         }
@@ -119,6 +125,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
                 throw new Exception($"结构:'{implBean.FullName}' 字段:'{f.Name}' 缺失");
             }
         }
+
         return new DBean(type, implBean, fields);
     }
 
@@ -129,6 +136,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
         {
             list.Add(type.Apply(this, c, ass));
         }
+
         return list;
     }
 
@@ -156,6 +164,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
             {
                 throw new ArgumentException($"json map 类型的 成员数据项:{e} 必须是 [key,value] 形式的列表");
             }
+
             DType key = type.KeyType.Apply(this, e[0], ass);
             DType value = type.ValueType.Apply(this, e[1], ass);
             if (!map.TryAdd(key, value))
@@ -163,8 +172,10 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
                 throw new Exception($"map 的 key:{key} 重复");
             }
         }
+
         return new DMap(type, map);
     }
+
 
     public DType Accept(TDateTime type, JsonElement x, DefAssembly ass)
     {

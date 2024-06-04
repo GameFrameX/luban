@@ -55,6 +55,11 @@ class JavaBinUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, str
         return $"{fieldName} = {bufName}.readString();";
     }
 
+    public string Accept(TLang type, string bufName, string fieldName)
+    {
+        return $"{fieldName} = {bufName}.readString();";
+    }
+
     public string Accept(TBean type, string bufName, string fieldName)
     {
         string src = $"{type.DefBean.FullNameWithTopModule}.deserialize({bufName})";
@@ -64,24 +69,28 @@ class JavaBinUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, str
 
     public string Accept(TArray type, string bufName, string fieldName)
     {
-        return $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.ElementType.Apply(JavaDeclaringTypeNameVisitor.Ins)}[n];for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringTypeNameVisitor.Ins)} _e;{type.ElementType.Apply(this, bufName, "_e")} {fieldName}[i] = _e;}}}}";
+        return
+            $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.ElementType.Apply(JavaDeclaringTypeNameVisitor.Ins)}[n];for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringTypeNameVisitor.Ins)} _e;{type.ElementType.Apply(this, bufName, "_e")} {fieldName}[i] = _e;}}}}";
     }
 
     public string Accept(TList type, string bufName, string fieldName)
     {
-        return $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n);for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _e;  {type.ElementType.Apply(this, bufName, "_e")} {fieldName}.add(_e);}}}}";
+        return
+            $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n);for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _e;  {type.ElementType.Apply(this, bufName, "_e")} {fieldName}.add(_e);}}}}";
     }
 
     public string Accept(TSet type, string bufName, string fieldName)
     {
-        return $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n * 3 / 2);for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _e;  {type.ElementType.Apply(this, bufName, "_e")} {fieldName}.add(_e);}}}}";
+        return
+            $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n * 3 / 2);for(int i = 0 ; i < n ; i++) {{ {type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _e;  {type.ElementType.Apply(this, bufName, "_e")} {fieldName}.add(_e);}}}}";
     }
 
     public string Accept(TMap type, string bufName, string fieldName)
     {
-        return $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n * 3 / 2);for(int i = 0 ; i < n ; i++) {{ {type.KeyType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _k;  {type.KeyType.Apply(this, bufName, "_k")} {type.ValueType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _v;  {type.ValueType.Apply(this, bufName, "_v")}     {fieldName}.put(_k, _v);}}}}";
-
+        return
+            $"{{int n = Math.min({bufName}.readSize(), {bufName}.size());{fieldName} = new {type.Apply(JavaDeclaringTypeNameVisitor.Ins)}(n * 3 / 2);for(int i = 0 ; i < n ; i++) {{ {type.KeyType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _k;  {type.KeyType.Apply(this, bufName, "_k")} {type.ValueType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)} _v;  {type.ValueType.Apply(this, bufName, "_v")}     {fieldName}.put(_k, _v);}}}}";
     }
+
 
     public string Accept(TDateTime type, string bufName, string fieldName)
     {

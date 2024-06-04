@@ -66,6 +66,11 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
         return DString.ValueOf(type, GetTextValue(x));
     }
 
+    public DType Accept(TLang type, YamlNode x, DefAssembly y)
+    {
+        return DString.ValueOf(type, GetTextValue(x));
+    }
+
     private static readonly YamlScalarNode s_typeNodeName = new(FieldNames.JsonTypeNameKey);
     private static readonly YamlScalarNode s_typeNodeNameFallback = new(FieldNames.FallbackTypeNameKey);
 
@@ -81,11 +86,13 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
             {
                 throw new Exception($"bean:'{bean.FullName}'是多态，需要指定{FieldNames.JsonTypeNameKey}属性.\n xml:{x}");
             }
+
             string subType = (string)typeNode;
             if (string.IsNullOrWhiteSpace(subType))
             {
                 throw new Exception($"bean:'{bean.FullName}'是多态，需要指定{FieldNames.JsonTypeNameKey}属性.\n xml:{x}");
             }
+
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
         }
         else
@@ -103,8 +110,10 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
                     fields.Add(null);
                     continue;
                 }
+
                 throw new Exception($"bean:{implBean.FullName} 字段:{f.Name} 缺失");
             }
+
             try
             {
                 fields.Add(f.CType.Apply(this, fele, y));
@@ -120,8 +129,8 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
                 dce.Push(bean, f);
                 throw dce;
             }
-
         }
+
         return new DBean(type, implBean, fields);
     }
 
@@ -132,6 +141,7 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
         {
             list.Add(type.Apply(this, e, ass));
         }
+
         return list;
     }
 
@@ -161,6 +171,7 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
             {
                 throw new ArgumentException($"yaml map 类型的 成员数据项:{e} 必须是 [key,value] 形式的列表");
             }
+
             DType key = type.KeyType.Apply(this, kv[0], y);
             DType value = type.ValueType.Apply(this, kv[1], y);
             if (!map.TryAdd(key, value))
@@ -168,8 +179,10 @@ class YamlDataCreator : ITypeFuncVisitor<YamlNode, DefAssembly, DType>
                 throw new Exception($"map 的 key:{key} 重复");
             }
         }
+
         return new DMap(type, map);
     }
+
 
     public DType Accept(TDateTime type, YamlNode x, DefAssembly y)
     {

@@ -54,6 +54,11 @@ public class UnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, str
         return $"{fieldName} = {jsonVarName}";
     }
 
+    public string Accept(TLang type, string jsonVarName, string fieldName)
+    {
+        return $"{fieldName} = {jsonVarName}";
+    }
+
     public string Accept(TBean type, string jsonVarName, string fieldName)
     {
         if (type.DefBean.IsAbstractType)
@@ -86,9 +91,9 @@ public class UnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, str
         return $"{fieldName} = {{}}\nfor _e in {jsonVarName}: var _k: {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.KeyType.Apply(this, "_e[0]", "_k")}; var _v: {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.ValueType.Apply(this, "_e[1]", "_v")}; {fieldName}[_k] = _v";
     }
 
+
     public string Accept(TDateTime type, string jsonVarName, string fieldName)
     {
         return $"{fieldName} = {jsonVarName}";
     }
-
 }

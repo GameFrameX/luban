@@ -53,6 +53,11 @@ public class RustDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "String";
     }
 
+    public string Accept(TLang type)
+    {
+        return "String";
+    }
+
     public string Accept(TDateTime type)
     {
         return "u64";
@@ -60,8 +65,8 @@ public class RustDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
 
     public string Accept(TBean type)
     {
-        return type.DefBean.IsAbstractType 
-            ? "std::sync::Arc<AbstractBase>" 
+        return type.DefBean.IsAbstractType
+            ? "std::sync::Arc<AbstractBase>"
             : $"crate::{(type.DefBean.TypeNameWithTypeMapper() ?? type.DefBean.FullName).Replace(".", "::")}";
     }
 

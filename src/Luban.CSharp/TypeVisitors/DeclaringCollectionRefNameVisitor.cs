@@ -102,6 +102,12 @@ public class DeclaringCollectionRefNameVisitor : ITypeFuncVisitor<string>
         }
         throw new Exception($"解析'{ConstStrings.HashMapTypeName}<{type.KeyType}, {type.ValueType}>' 的ref失败");
     }
+
+    public string Accept(TLang type)
+    {
+        throw new NotImplementedException();
+    }
+
     private static DefTable GetCollectionRefTable(TType type)
     {
         var refTag = type.GetTag("ref");

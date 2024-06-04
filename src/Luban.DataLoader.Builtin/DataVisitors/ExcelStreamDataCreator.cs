@@ -23,18 +23,19 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return b;
         }
+
         var s = x.ToString().ToLower().Trim();
         return LoadDataUtil.ParseExcelBool(s);
     }
 
     public DType Accept(TBool type, ExcelStream x)
     {
-
         var d = x.Read();
         if (CheckNull(type.IsNullable, d))
         {
             return null;
         }
+
         return DBool.ValueOf(CreateBool(d));
     }
 
@@ -45,10 +46,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (!byte.TryParse(d.ToString(), out byte v))
         {
             throw new InvalidExcelDataException($"{d} 不是 byte 类型值");
         }
+
         return DByte.ValueOf(v);
     }
 
@@ -59,10 +62,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (!short.TryParse(d.ToString(), out short v))
         {
             throw new InvalidExcelDataException($"{d} 不是 short 类型值");
         }
+
         return DShort.ValueOf(v);
     }
 
@@ -73,6 +78,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         var ds = d.ToString();
         //if (field?.Remapper is TEnum te)
         //{
@@ -85,6 +91,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             throw new InvalidExcelDataException($"{d} 不是 int 类型值");
         }
+
         return DInt.ValueOf(v);
     }
 
@@ -95,6 +102,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         var ds = d.ToString();
         //if (field?.Remapper is TEnum te)
         //{
@@ -107,6 +115,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             throw new InvalidExcelDataException($"{d} 不是 long 类型值");
         }
+
         return DLong.ValueOf(v);
     }
 
@@ -117,10 +126,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (!float.TryParse(d.ToString(), out var v))
         {
             throw new InvalidExcelDataException($"{d} 不是 float 类型值");
         }
+
         return DFloat.ValueOf(v);
     }
 
@@ -131,10 +142,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (!double.TryParse(d.ToString(), out var v))
         {
             throw new InvalidExcelDataException($"{d} 不是 double 类型值");
         }
+
         return DDouble.ValueOf(v);
     }
 
@@ -145,10 +158,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (d == null)
         {
             throw new InvalidExcelDataException($"枚举值不能为空");
         }
+
         return new DEnum(type, d.ToString().Trim());
     }
 
@@ -167,6 +182,26 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
                 throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
             }
         }
+
+        return DString.ValueOf(type, s);
+    }
+
+    public DType Accept(TLang type, ExcelStream x)
+    {
+        var d = x.Read();
+        var s = ParseString(d);
+        if (s == null)
+        {
+            if (type.IsNullable)
+            {
+                return null;
+            }
+            else
+            {
+                throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
+            }
+        }
+
         return DString.ValueOf(type, s);
     }
 
@@ -193,10 +228,12 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
+
         if (d is System.DateTime datetime)
         {
             return new DDateTime(datetime);
         }
+
         return DataUtil.CreateDateTime(d.ToString());
     }
 
@@ -229,6 +266,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
                 throw dce;
             }
         }
+
         return list;
     }
 
@@ -253,8 +291,10 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
                 {
                     throw new InvalidExcelDataException($"type:{originBean.FullName}不是可空类型. 不能为空");
                 }
+
                 return null;
             }
+
             DefBean implType = DataUtil.GetImplTypeByNameOrAlias(originBean, subType);
             return new DBean(type, implType, CreateBeanFields(implType, x));
         }
@@ -278,6 +318,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
                     }
                 }
             }
+
             return new DBean(type, originBean, CreateBeanFields(originBean, x));
         }
     }
@@ -290,6 +331,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             stream = new ExcelStream(stream.ReadCell(), sep);
         }
+
         return stream;
     }
 
@@ -303,6 +345,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             datas.Add(eleType.Apply(this, stream));
         }
+
         return datas;
     }
 
@@ -336,6 +379,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
                 throw new InvalidExcelDataException($"map 的 key:{key} 重复");
             }
         }
+
         return new DMap(type, datas);
     }
 }

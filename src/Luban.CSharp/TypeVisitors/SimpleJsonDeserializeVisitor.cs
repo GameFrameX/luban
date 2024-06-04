@@ -53,6 +53,11 @@ public class SimpleJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         return $"{{ if(!{json}.IsString) {{ throw new SerializationException(); }}  {x} = {json}; }}";
     }
 
+    public string Accept(TLang type, string json, string x, int depth)
+    {
+        return $"{{ if(!{json}.IsString) {{ throw new SerializationException(); }}  {x} = {json}; }}";
+    }
+
     public string Accept(TDateTime type, string json, string x, int depth)
     {
         return $"{{ if(!{json}.IsNumber) {{ throw new SerializationException(); }}  {x} = {json}; }}";
@@ -80,13 +85,16 @@ public class SimpleJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
             {
                 throw new System.Exception("��ά����û��Ԫ������");
             }
+
             typeStr = $"{type.FinalElementType.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}[{_n}]";
             for (int i = 0; i < type.Dimension - 1; i++)
             {
                 typeStr += "[]";
             }
         }
-        return $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} int {_n} = {tempJsonName}.Count; {x} = new {typeStr}; int {__index}=0; foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}[{__index}++] = {__v}; }}   }}";
+
+        return
+            $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} int {_n} = {tempJsonName}.Count; {x} = new {typeStr}; int {__index}=0; foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}[{__index}++] = {__v}; }}   }}";
     }
 
     public string Accept(TList type, string json, string x, int depth)
@@ -95,7 +103,8 @@ public class SimpleJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __v = $"__v{depth}";
         string __json = $"__json{depth}";
         string tempJsonName = __json;
-        return $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({tempJsonName}.Count); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}.Add({__v}); }}   }}";
+        return
+            $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({tempJsonName}.Count); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}.Add({__v}); }}   }}";
     }
 
     public string Accept(TSet type, string json, string x, int depth)
@@ -104,7 +113,8 @@ public class SimpleJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __v = $"__v{depth}";
         string __json = $"__json{depth}";
         string tempJsonName = __json;
-        return $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(/*{tempJsonName}.Count*/); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}.Add({__v}); }}   }}";
+        return
+            $"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(/*{tempJsonName}.Count*/); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, __e, __v, depth + 1)}  {x}.Add({__v}); }}   }}";
     }
 
     public string Accept(TMap type, string json, string x, int depth)
@@ -114,6 +124,7 @@ public class SimpleJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __v = $"_v{depth}";
         string __json = $"__json{depth}";
         string tempJsonName = __json;
-        return @$"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({tempJsonName}.Count); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)} {__k};  {type.KeyType.Apply(this, $"{__e}[0]", __k, depth + 1)} {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ValueType.Apply(this, $"{__e}[1]", __v, depth + 1)}  {x}.Add({__k}, {__v}); }}   }}";
+        return
+            @$"{{ var {tempJsonName} = {json}; if(!{tempJsonName}.IsArray) {{ throw new SerializationException(); }} {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({tempJsonName}.Count); foreach(JSONNode {__e} in {tempJsonName}.Children) {{ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)} {__k};  {type.KeyType.Apply(this, $"{__e}[0]", __k, depth + 1)} {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ValueType.Apply(this, $"{__e}[1]", __v, depth + 1)}  {x}.Add({__k}, {__v}); }}   }}";
     }
 }

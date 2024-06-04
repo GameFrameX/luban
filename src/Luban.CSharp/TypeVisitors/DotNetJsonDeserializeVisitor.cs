@@ -7,6 +7,7 @@ namespace Luban.CSharp.TypeVisitors;
 public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int, string>
 {
     public static DotNetJsonDeserializeVisitor Ins { get; } = new();
+
     public string Accept(TBool type, string json, string x, int depth)
     {
         return $"{x} = {json}.GetBoolean();";
@@ -52,6 +53,11 @@ public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         return $"{x} = {json}.GetString();";
     }
 
+    public string Accept(TLang type, string json, string x, int depth)
+    {
+        return $"{x} = {json}.GetString();";
+    }
+
     public string Accept(TDateTime type, string json, string x, int depth)
     {
         return $"{x} = {json}.GetInt64();";
@@ -78,13 +84,16 @@ public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
             {
                 throw new System.Exception("��ά����û��Ԫ������");
             }
+
             typeStr = $"{type.FinalElementType.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}[{_n}]";
             for (int i = 0; i < type.Dimension - 1; i++)
             {
                 typeStr += "[]";
             }
         }
-        return $"{{ var {__json} = {json}; int {_n} = {__json}.GetArrayLength(); {x} = new {typeStr}; int {__index}=0; foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}[{__index}++] = {__v}; }}   }}";
+
+        return
+            $"{{ var {__json} = {json}; int {_n} = {__json}.GetArrayLength(); {x} = new {typeStr}; int {__index}=0; foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}[{__index}++] = {__v}; }}   }}";
     }
 
     public string Accept(TList type, string json, string x, int depth)
@@ -92,7 +101,8 @@ public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __e = $"__e{depth}";
         string __v = $"__v{depth}";
         string __json = $"__json{depth}";
-        return $"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}.Add({__v}); }}   }}";
+        return
+            $"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}.Add({__v}); }}   }}";
     }
 
     public string Accept(TSet type, string json, string x, int depth)
@@ -100,7 +110,8 @@ public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __e = $"__e{depth}";
         string __v = $"__v{depth}";
         string __json = $"__json{depth}";
-        return $"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}.Add({__v}); }}   }}";
+        return
+            $"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.ElementType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ElementType.Apply(this, $"{__e}", $"{__v}", depth + 1)}  {x}.Add({__v}); }}   }}";
     }
 
     public string Accept(TMap type, string json, string x, int depth)
@@ -109,6 +120,7 @@ public class DotNetJsonDeserializeVisitor : ITypeFuncVisitor<string, string, int
         string __k = $"_k{depth}";
         string __v = $"_v{depth}";
         string __json = $"__json{depth}";
-        return @$"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)} {__k};  {type.KeyType.Apply(this, $"{__e}[0]", __k, depth + 1)} {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ValueType.Apply(this, $"{__e}[1]", __v, depth + 1)}  {x}.Add({__k}, {__v}); }}   }}";
+        return
+            @$"{{ var {__json} = {json}; {x} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}({__json}.GetArrayLength()); foreach(JsonElement {__e} in {__json}.EnumerateArray()) {{ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)} {__k};  {type.KeyType.Apply(this, $"{__e}[0]", __k, depth + 1)} {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)} {__v};  {type.ValueType.Apply(this, $"{__e}[1]", __v, depth + 1)}  {x}.Add({__k}, {__v}); }}   }}";
     }
 }

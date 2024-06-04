@@ -56,6 +56,11 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
         return DString.ValueOf(type, x.Value);
     }
 
+    public DType Accept(TLang type, XElement x, DefAssembly y)
+    {
+        return DString.ValueOf(type, x.Value);
+    }
+
     public DType Accept(TBean type, XElement x, DefAssembly ass)
     {
         var bean = type.DefBean;
@@ -68,10 +73,12 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
             {
                 subType = x.Attribute(FieldNames.FallbackTypeNameKey)?.Value;
             }
+
             if (string.IsNullOrWhiteSpace(subType))
             {
                 throw new Exception($"bean:'{bean.FullName}'是多态，需要指定{FieldNames.XmlTypeNameKey}属性.\n xml:{x}");
             }
+
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
         }
         else
@@ -91,8 +98,10 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
                     fields.Add(null);
                     continue;
                 }
+
                 throw new Exception($"字段:{f.Name} 缺失");
             }
+
             try
             {
                 fields.Add(f.CType.Apply(this, fele, ass));
@@ -108,8 +117,8 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
                 dce.Push(bean, f);
                 throw dce;
             }
-
         }
+
         return new DBean(type, implBean, fields);
     }
 
@@ -120,6 +129,7 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
         {
             list.Add(type.Apply(this, e, ass));
         }
+
         return list;
     }
 
@@ -150,8 +160,10 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
                 throw new Exception($"map 的 key:{key} 重复");
             }
         }
+
         return new DMap(type, map);
     }
+
 
     public DType Accept(TDateTime type, XElement x, DefAssembly ass)
     {

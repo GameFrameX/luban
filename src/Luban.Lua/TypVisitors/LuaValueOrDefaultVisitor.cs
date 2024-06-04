@@ -52,6 +52,11 @@ public class LuaValueOrDefaultVisitor : ITypeFuncVisitor<string, string>
         return $"{x} or \"\"";
     }
 
+    public string Accept(TLang type, string x)
+    {
+        return $"{x} or \"\"";
+    }
+
     public string Accept(TBean type, string x)
     {
         return $"{x} or {{}}";
@@ -76,6 +81,7 @@ public class LuaValueOrDefaultVisitor : ITypeFuncVisitor<string, string>
     {
         return $"{x} or {{}}";
     }
+
 
     public string Accept(TDateTime type, string x)
     {

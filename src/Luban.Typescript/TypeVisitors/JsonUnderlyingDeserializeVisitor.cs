@@ -54,6 +54,11 @@ public class JsonUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string,
         return $"{fieldName} = {jsonVarName}";
     }
 
+    public string Accept(TLang type, string jsonVarName, string fieldName, int depth)
+    {
+        return $"{fieldName} = {jsonVarName}";
+    }
+
     public string Accept(TDateTime type, string jsonVarName, string fieldName, int depth)
     {
         return $"{fieldName} = {jsonVarName}";
@@ -73,12 +78,14 @@ public class JsonUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string,
 
     public string Accept(TArray type, string jsonVarName, string fieldName, int depth)
     {
-        return $"{{ {fieldName} = []; for(let _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.push(_e{depth});}}}}";
+        return
+            $"{{ {fieldName} = []; for(let _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.push(_e{depth});}}}}";
     }
 
     public string Accept(TList type, string jsonVarName, string fieldName, int depth)
     {
-        return $"{{ {fieldName} = []; for(let _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.push(_e{depth});}}}}";
+        return
+            $"{{ {fieldName} = []; for(let _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.push(_e{depth});}}}}";
     }
 
     public string Accept(TSet type, string jsonVarName, string fieldName, int depth)
@@ -89,12 +96,14 @@ public class JsonUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string,
         }
         else
         {
-            return $"{{ {fieldName} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(); for(var _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.add(_e{depth});}}}}";
+            return
+                $"{{ {fieldName} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(); for(var _ele{depth} of {jsonVarName}) {{ let _e{depth}; {type.ElementType.Apply(this, $"_ele{depth}", $"_e{depth}", depth + 1)}; {fieldName}.add(_e{depth});}}}}";
         }
     }
 
     public string Accept(TMap type, string jsonVarName, string fieldName, int depth)
     {
-        return $"{fieldName} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(); for(var _entry{depth}_ of {jsonVarName}) {{ let _k{depth}; {type.KeyType.Apply(this, $"_entry{depth}_[0]", $"_k{depth}", depth + 1)};  let _v{depth};  {type.ValueType.Apply(this, $"_entry{depth}_[1]", $"_v{depth}", depth + 1)}; {fieldName}.set(_k{depth}, _v{depth});  }}";
+        return
+            $"{fieldName} = new {type.Apply(DeclaringTypeNameVisitor.Ins)}(); for(var _entry{depth}_ of {jsonVarName}) {{ let _k{depth}; {type.KeyType.Apply(this, $"_entry{depth}_[0]", $"_k{depth}", depth + 1)};  let _v{depth};  {type.ValueType.Apply(this, $"_entry{depth}_[1]", $"_v{depth}", depth + 1)}; {fieldName}.set(_k{depth}, _v{depth});  }}";
     }
 }

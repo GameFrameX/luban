@@ -55,6 +55,11 @@ public class RustJsonUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, str
         return $"{json}.as_str().unwrap().to_string()";
     }
 
+    public string Accept(TLang type, string json, string field, int depth)
+    {
+        return $"{json}.as_str().unwrap().to_string()";
+    }
+
     public string Accept(TDateTime type, string json, string field, int depth)
     {
         return $"({json}.as_i64().unwrap() as u64)";
@@ -84,6 +89,8 @@ public class RustJsonUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, str
 
     public string Accept(TMap type, string json, string field, int depth)
     {
-        return $"std::collections::HashMap::from_iter({json}.as_array().unwrap().iter().map(|x| {{let array = x.as_array().unwrap();({type.KeyType.Apply(this, "array[0]", "", depth + 1)}, {type.ElementType.Apply(this, "array[1]", "", depth + 1)})}}).collect::<Vec<({type.KeyType.Apply(RustDeclaringBoxTypeNameVisitor.Ins)}, {type.ElementType.Apply(RustDeclaringBoxTypeNameVisitor.Ins)})>>())".Replace("?", ".unwrap()");
+        return
+            $"std::collections::HashMap::from_iter({json}.as_array().unwrap().iter().map(|x| {{let array = x.as_array().unwrap();({type.KeyType.Apply(this, "array[0]", "", depth + 1)}, {type.ElementType.Apply(this, "array[1]", "", depth + 1)})}}).collect::<Vec<({type.KeyType.Apply(RustDeclaringBoxTypeNameVisitor.Ins)}, {type.ElementType.Apply(RustDeclaringBoxTypeNameVisitor.Ins)})>>())"
+                .Replace("?", ".unwrap()");
     }
 }

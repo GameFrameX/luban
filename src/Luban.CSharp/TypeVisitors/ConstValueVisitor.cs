@@ -81,4 +81,9 @@ public class ConstValueVisitor : ITypeFuncVisitor<string, string>
     {
         throw new NotImplementedException();
     }
+
+    public string Accept(TLang type, string x)
+    {
+        return "\"" + x + "\"";
+    }
 }

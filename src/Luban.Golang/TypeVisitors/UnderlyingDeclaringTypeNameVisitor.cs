@@ -54,6 +54,11 @@ public class UnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "string";
     }
 
+    public string Accept(TLang type)
+    {
+        return "string";
+    }
+
     public string Accept(TBean type)
     {
         return type.DefBean.IsAbstractType ? $"interface{{}}" : $"*{GoCommonTemplateExtension.FullName(type.DefBean)}";
@@ -78,6 +83,7 @@ public class UnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
     {
         return $"map[{type.KeyType.Apply(this)}]{type.ValueType.Apply(this)}";
     }
+
 
     public string Accept(TDateTime type)
     {

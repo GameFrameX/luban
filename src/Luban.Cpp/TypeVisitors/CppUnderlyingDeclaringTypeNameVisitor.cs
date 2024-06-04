@@ -83,4 +83,9 @@ public class CppUnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
     {
         return $"::luban::HashMap<{type.KeyType.Apply(this)}, {type.ValueType.Apply(this)}>";
     }
+
+    public string Accept(TLang type)
+    {
+        return "::luban::String";
+    }
 }

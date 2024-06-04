@@ -54,6 +54,11 @@ public class DeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "String";
     }
 
+    public string Accept(TLang type)
+    {
+        return "String";
+    }
+
     public virtual string Accept(TDateTime type)
     {
         return "int";

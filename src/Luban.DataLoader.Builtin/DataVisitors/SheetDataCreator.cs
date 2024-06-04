@@ -37,15 +37,18 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DBool.ValueOf(false);
         }
+
         if (x is bool v)
         {
             return DBool.ValueOf(v);
         }
+
         return DBool.ValueOf(LoadDataUtil.ParseExcelBool(x.ToString()));
     }
 
@@ -56,10 +59,12 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             return DByte.Default;
         }
+
         return DByte.ValueOf(byte.Parse(x.ToString()));
     }
 
@@ -70,13 +75,16 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DShort.Default;
         }
+
         return DShort.ValueOf(short.Parse(x.ToString()));
     }
+
     public DType Accept(TInt type, RowColumnSheet sheet, TitleRow row)
     {
         object x = row.Current;
@@ -84,11 +92,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DInt.Default;
         }
+
         return DInt.ValueOf(int.Parse(x.ToString()));
     }
 
@@ -99,11 +109,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DLong.Default;
         }
+
         return DLong.ValueOf(long.Parse(x.ToString()));
     }
 
@@ -114,11 +126,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DFloat.Default;
         }
+
         return DFloat.ValueOf(float.Parse(x.ToString()));
     }
 
@@ -129,11 +143,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (CheckDefault(x))
         {
             ThrowIfNonEmpty(row);
             return DDouble.Default;
         }
+
         return DDouble.ValueOf(double.Parse(x.ToString()));
     }
 
@@ -146,6 +162,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             {
                 return null;
             }
+
             if (CheckDefault(x))
             {
                 if (type.DefEnum.IsFlags || type.DefEnum.HasZeroValueItem)
@@ -155,6 +172,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
 
                 throw new InvalidExcelDataException($"枚举类:'{type.DefEnum.FullName}' 没有value为0的枚举项, 不支持默认值");
             }
+
             return new DEnum(type, x.ToString());
         }
 
@@ -162,6 +180,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             throw new Exception($"{type.DefEnum.FullName} 不支持多行格式");
         }
+
         if (row.Fields != null)
         {
             //throw new Exception($"array 不支持 子字段. 忘记将字段设为多行模式?  {row.SelfTitle.Name} => *{row.SelfTitle.Name}");
@@ -176,16 +195,19 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 {
                     throw new Exception($"列名:{itemName} 不是枚举类型'{type.DefEnum.FullName}'的有效枚举项");
                 }
+
                 if (field.IsBlank)
                 {
                     continue;
                 }
+
                 string cur = field.Current.ToString().ToLower();
                 if (cur != "0" && cur != "false")
                 {
                     items.Add(itemName);
                 }
             }
+
             if (items.Count == 0)
             {
                 if (type.IsNullable)
@@ -200,12 +222,15 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
 
                 throw new InvalidExcelDataException($"枚举类:'{type.DefEnum.FullName}' 没有value为0的枚举项, 不支持默认值");
             }
+
             return new DEnum(type, string.Join('|', items));
         }
+
         if (row.Elements != null)
         {
             throw new Exception($"{type.DefEnum.FullName} 不支持多行子字段格式");
         }
+
         throw new Exception();
     }
 
@@ -221,6 +246,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return DataUtil.UnEscapeRawString(s);
         }
+
         return d.ToString();
     }
 
@@ -231,6 +257,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             ThrowIfNonEmpty(row);
         }
+
         var s = ParseString(x);
         if (s == null)
         {
@@ -241,6 +268,29 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
 
             throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
         }
+
+        return DString.ValueOf(type, s);
+    }
+
+    public DType Accept(TLang type, RowColumnSheet sheet, TitleRow row)
+    {
+        object x = row.Current;
+        if (CheckDefault(x))
+        {
+            ThrowIfNonEmpty(row);
+        }
+
+        var s = ParseString(x);
+        if (s == null)
+        {
+            if (type.IsNullable)
+            {
+                return null;
+            }
+
+            throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
+        }
+
         return DString.ValueOf(type, s);
     }
 
@@ -251,10 +301,12 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             return null;
         }
+
         if (d is System.DateTime datetime)
         {
             return new DDateTime(datetime);
         }
+
         return DataUtil.CreateDateTime(d.ToString());
     }
 
@@ -270,6 +322,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             {
                 throw new Exception($"bean:'{bean.FullName}' 缺失 列:'{fname}'，请检查是否写错或者遗漏");
             }
+
             try
             {
                 list.Add(f.CType.Apply(this, sheet, field));
@@ -286,12 +339,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 throw dce;
             }
         }
+
         return list;
     }
 
     public DType Accept(TBean type, RowColumnSheet sheet, TitleRow row)
     {
-        string sep = row.SelfTitle.Sep;// type.GetBeanAs<DefBean>().Sep;
+        string sep = row.SelfTitle.Sep; // type.GetBeanAs<DefBean>().Sep;
         if (row.Row != null)
         {
             var s = row.AsStream(sep);
@@ -299,6 +353,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             {
                 return null;
             }
+
             return type.Apply(ExcelStreamDataCreator.Ins, s);
         }
 
@@ -309,8 +364,10 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             {
                 return null;
             }
+
             return type.Apply(ExcelStreamDataCreator.Ins, s);
         }
+
         if (row.Fields != null)
         {
             sep += type.DefBean.Sep;
@@ -322,6 +379,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 {
                     throw new Exception($"type:'{originBean.FullName}' 是多态类型,需要定义'{FieldNames.ExcelTypeNameKey}'列来指定具体子类型");
                 }
+
                 TitleRow valueTitle = row.GetSubTitleNamedRow(FieldNames.ExcelValueNameKey);
                 sep += type.GetTag("sep");
                 string subType = typeTitle.Current?.ToString()?.Trim();
@@ -331,8 +389,10 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     {
                         throw new Exception($"type:'{originBean.FullName}' 不是可空类型 '{type.DefBean.FullName}?' , 不能为空");
                     }
+
                     return null;
                 }
+
                 DefBean implType = DataUtil.GetImplTypeByNameOrAlias(originBean, subType);
                 if (valueTitle == null)
                 {
@@ -347,6 +407,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     {
                         return null;
                     }
+
                     return new DBean(type, implType, CreateBeanFields(implType, s));
                 }
 
@@ -357,8 +418,10 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     {
                         return null;
                     }
+
                     return new DBean(type, implType, CreateBeanFields(implType, s));
                 }
+
                 throw new Exception();
             }
 
@@ -369,6 +432,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 {
                     throw new Exception($"type:'{originBean.FullName}' 是可空类型,需要定义'{FieldNames.ExcelTypeNameKey}'列来指明是否可空");
                 }
+
                 string subType = typeTitle.Current?.ToString()?.Trim();
                 if (subType == null || subType == FieldNames.BeanNullType)
                 {
@@ -383,11 +447,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
 
             return new DBean(type, originBean, CreateBeanFields(originBean, sheet, row));
         }
+
         if (row.Elements != null)
         {
             var s = row.AsMultiRowConcatElements(sep);
             return type.Apply(ExcelStreamDataCreator.Ins, s);
         }
+
         throw new Exception();
     }
 
@@ -401,6 +467,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 datas.Add(type.Apply(ExcelStreamDataCreator.Ins, stream));
             }
         }
+
         return datas;
     }
 
@@ -411,11 +478,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             var s = row.AsStream(row.SelfTitle.Sep);
             return ExcelStreamDataCreator.Ins.ReadList(type, elementType, s);
         }
+
         if (row.Rows != null)
         {
             var s = row.AsMultiRowStream(row.SelfTitle.Sep);
             return ReadList(elementType, s);
         }
+
         if (row.Fields != null)
         {
             //throw new Exception($"array 不支持 子字段. 忘记将字段设为多行模式?  {row.SelfTitle.Name} => *{row.SelfTitle.Name}");
@@ -429,14 +498,18 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 {
                     continue;
                 }
+
                 datas.Add(elementType.Apply(this, sheet, field));
             }
+
             return datas;
         }
+
         if (row.Elements != null)
         {
             return row.Elements.Select(e => elementType.Apply(this, sheet, e)).ToList();
         }
+
         throw new Exception();
     }
 
@@ -470,6 +543,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
         {
             throw new Exception($"map在非多行模式下不支持多行填写，是否忘记将字段设为多行模式?  {row.SelfTitle.Name} => *{row.SelfTitle.Name}");
         }
+
         if (row.Fields != null)
         {
             var datas = new Dictionary<DType, DType>();
@@ -482,6 +556,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     {
                         continue;
                     }
+
                     var valueData = type.ValueType.Apply(ExcelStreamDataCreator.Ins, e.Value.AsStream(""));
                     datas.Add(keyData, valueData);
                 }
@@ -491,8 +566,10 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     datas.Add(keyData, valueData);
                 }
             }
+
             return new DMap(type, datas);
         }
+
         if (row.Elements != null)
         {
             var datas = new Dictionary<DType, DType>();
@@ -505,6 +582,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     {
                         throw new Exception($"多行模式下map需要定义'{FieldNames.ExcelMapKey}'列来指明key");
                     }
+
                     var keyData = type.KeyType.Apply(this, sheet, keyTitle);
                     var valueData = type.ValueType.Apply(this, sheet, e);
                     datas.Add(keyData, valueData);
@@ -517,10 +595,13 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     datas.Add(keyData, valueData);
                 }
             }
+
             return new DMap(type, datas);
         }
+
         throw new Exception();
     }
+
 
     private List<DType> CreateBeanFields(DefBean bean, ExcelStream stream)
     {
@@ -543,6 +624,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 throw dce;
             }
         }
+
         return list;
     }
 }

@@ -102,6 +102,11 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         return DString.ValueOf(type, x);
     }
 
+    public DType Accept(TLang type, string x)
+    {
+        return DString.ValueOf(type, x);
+    }
+
     public DType Accept(TBean type, string x)
     {
         throw new NotSupportedException();
@@ -126,6 +131,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
     {
         throw new NotSupportedException();
     }
+
 
     public DType Accept(TDateTime type, string x)
     {

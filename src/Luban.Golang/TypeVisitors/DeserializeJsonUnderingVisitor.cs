@@ -16,7 +16,8 @@ class DeserializeJsonUnderingVisitor : ITypeFuncVisitor<string, string, string, 
 
     private string DeserializeNumber(TType type, string varName, string fieldName, string bufName)
     {
-        return $"{{ var _ok_ bool; var _tempNum_ float64; if _tempNum_, _ok_ = {bufName}[\"{fieldName}\"].(float64); !_ok_ {{ err = errors.New(\"{fieldName} error\"); return }}; {varName} = {type.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}(_tempNum_) }}";
+        return
+            $"{{ var _ok_ bool; var _tempNum_ float64; if _tempNum_, _ok_ = {bufName}[\"{fieldName}\"].(float64); !_ok_ {{ err = errors.New(\"{fieldName} error\"); return }}; {varName} = {type.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}(_tempNum_) }}";
     }
 
     public string Accept(TByte type, string varName, string fieldName, string bufName)
@@ -65,6 +66,11 @@ class DeserializeJsonUnderingVisitor : ITypeFuncVisitor<string, string, string, 
         return DeserializeString(type, varName, fieldName, bufName);
     }
 
+    public string Accept(TLang type, string varName, string fieldName, string bufName)
+    {
+        return DeserializeString(type, varName, fieldName, bufName);
+    }
+
     public string Accept(TDateTime type, string varName, string fieldName, string bufName)
     {
         return DeserializeNumber(type, varName, fieldName, bufName);
@@ -72,7 +78,8 @@ class DeserializeJsonUnderingVisitor : ITypeFuncVisitor<string, string, string, 
 
     public string Accept(TBean type, string varName, string fieldName, string bufName)
     {
-        return $"{{ var _ok_ bool; var _x_ map[string]interface{{}}; if _x_, _ok_ = {bufName}[\"{fieldName}\"].(map[string]interface{{}}); !_ok_ {{ err = errors.New(\"{fieldName} error\"); return }}; if {varName}, err = {($"New{GoCommonTemplateExtension.FullName(type.DefBean)}(_x_)")}; err != nil {{ return }} }}";
+        return
+            $"{{ var _ok_ bool; var _x_ map[string]interface{{}}; if _x_, _ok_ = {bufName}[\"{fieldName}\"].(map[string]interface{{}}); !_ok_ {{ err = errors.New(\"{fieldName} error\"); return }}; if {varName}, err = {($"New{GoCommonTemplateExtension.FullName(type.DefBean)}(_x_)")}; err != nil {{ return }} }}";
     }
 
 

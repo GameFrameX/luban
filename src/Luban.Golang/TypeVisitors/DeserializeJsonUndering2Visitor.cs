@@ -16,7 +16,8 @@ class DeserializeJsonUndering2Visitor : ITypeFuncVisitor<string, string, string>
 
     private string DeserializeNumber(TType type, string varName, string bufName)
     {
-        return $"{{ var _ok_ bool; var _x_ float64; if _x_, _ok_ = {bufName}.(float64); !_ok_ {{ err = errors.New(\"{varName} error\"); return }}; {varName} = {type.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}(_x_) }}";
+        return
+            $"{{ var _ok_ bool; var _x_ float64; if _x_, _ok_ = {bufName}.(float64); !_ok_ {{ err = errors.New(\"{varName} error\"); return }}; {varName} = {type.Apply(UnderlyingDeclaringTypeNameVisitor.Ins)}(_x_) }}";
     }
 
     public string Accept(TByte type, string varName, string bufName)
@@ -65,6 +66,11 @@ class DeserializeJsonUndering2Visitor : ITypeFuncVisitor<string, string, string>
         return DeserializeString(type, varName, bufName);
     }
 
+    public string Accept(TLang type, string varName, string bufName)
+    {
+        return DeserializeString(type, varName, bufName);
+    }
+
     public string Accept(TDateTime type, string varName, string bufName)
     {
         return DeserializeNumber(type, varName, bufName);
@@ -72,7 +78,8 @@ class DeserializeJsonUndering2Visitor : ITypeFuncVisitor<string, string, string>
 
     public string Accept(TBean type, string varName, string bufName)
     {
-        return $"{{ var _ok_ bool; var _x_ map[string]interface{{}}; if _x_, _ok_ = {bufName}.(map[string]interface{{}}); !_ok_ {{ err = errors.New(\"{varName} error\"); return }}; if {varName}, err = {($"New{GoCommonTemplateExtension.FullName(type.DefBean)}(_x_)")}; err != nil {{ return }} }}";
+        return
+            $"{{ var _ok_ bool; var _x_ map[string]interface{{}}; if _x_, _ok_ = {bufName}.(map[string]interface{{}}); !_ok_ {{ err = errors.New(\"{varName} error\"); return }}; if {varName}, err = {($"New{GoCommonTemplateExtension.FullName(type.DefBean)}(_x_)")}; err != nil {{ return }} }}";
     }
 
     public string Accept(TArray type, string varName, string bufName)

@@ -52,6 +52,11 @@ public class RecursiveResolveVisitor : ITypeFuncVisitor<string, string, string>
         throw new NotImplementedException();
     }
 
+    public string Accept(TLang type, string x, string y)
+    {
+        throw new NotImplementedException();
+    }
+
     public string Accept(TDateTime type, string fieldName, string tablesName)
     {
         throw new NotImplementedException();

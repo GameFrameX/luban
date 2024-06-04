@@ -52,6 +52,11 @@ public class UnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "string";
     }
 
+    public string Accept(TLang type)
+    {
+        return "string";
+    }
+
     public string Accept(TBean type)
     {
         return type.DefBean.FullName;
@@ -76,6 +81,7 @@ public class UnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
     {
         return $"Map<{type.KeyType.Apply(this)}, {type.ValueType.Apply(this)}>";
     }
+
 
     public string Accept(TDateTime type)
     {

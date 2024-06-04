@@ -100,6 +100,18 @@ class LuaDataCreator : ITypeFuncVisitor<object, DefAssembly, DType>
         }
     }
 
+    public DType Accept(TLang type, object x, DefAssembly y)
+    {
+        if (x is string s)
+        {
+            return DString.ValueOf(type, s);
+        }
+        else
+        {
+            throw new Exception($"{x} 不是 string 类型数据");
+        }
+    }
+
     public DType Accept(TBean type, object x, DefAssembly ass)
     {
         var table = (LuaTable)x;
@@ -121,6 +133,7 @@ class LuaDataCreator : ITypeFuncVisitor<object, DefAssembly, DType>
             {
                 throw new Exception($"结构:{bean.FullName} 是多态类型，必须用 {FieldNames.LuaTypeNameKey} 字段指定 子类名");
             }
+
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
         }
         else
@@ -161,6 +174,7 @@ class LuaDataCreator : ITypeFuncVisitor<object, DefAssembly, DType>
                 throw new Exception($"结构:{implBean.FullName} 字段:{f.Name} 缺失");
             }
         }
+
         return new DBean(type, implBean, fields);
     }
 
@@ -171,6 +185,7 @@ class LuaDataCreator : ITypeFuncVisitor<object, DefAssembly, DType>
         {
             list.Add(type.Apply(this, c, ass));
         }
+
         return list;
     }
 
@@ -202,8 +217,10 @@ class LuaDataCreator : ITypeFuncVisitor<object, DefAssembly, DType>
                 throw new Exception($"map 的 key:{key} 重复");
             }
         }
+
         return new DMap(type, map);
     }
+
 
     public DType Accept(TDateTime type, object x, DefAssembly ass)
     {

@@ -47,6 +47,11 @@ public class LuaDeserializeMethodNameVisitor : ITypeFuncVisitor<string>
         return "readInt";
     }
 
+    public string Accept(TLang type)
+    {
+        return "readString";
+    }
+
     public string Accept(TString type)
     {
         return "readString";
@@ -76,6 +81,7 @@ public class LuaDeserializeMethodNameVisitor : ITypeFuncVisitor<string>
     {
         return "readMap";
     }
+
 
     public string Accept(TDateTime type)
     {

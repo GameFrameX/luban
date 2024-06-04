@@ -53,6 +53,11 @@ public class BinUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, 
         return $"{{ if {fieldName}, {err} = {bufName}.ReadString(); {err} != nil {{ {err} = errors.New(\"error\"); return }} }}";
     }
 
+    public string Accept(TLang type, string fieldName, string bufName, string err, int depth)
+    {
+        return $"{{ if {fieldName}, {err} = {bufName}.ReadString(); {err} != nil {{ {err} = errors.New(\"error\"); return }} }}";
+    }
+
     public string Accept(TDateTime type, string fieldName, string bufName, string err, int depth)
     {
         return $"{{ if {fieldName}, {err} = {bufName}.ReadLong(); {err} != nil {{ {err} = errors.New(\"error\"); return }} }}";
@@ -65,7 +70,8 @@ public class BinUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, 
 
     private string GenList(TType elementType, string fieldName, string bufName, string err, int depth)
     {
-        return $@"{{{fieldName} = make([]{elementType.Apply(DeclaringTypeNameVisitor.Ins)}, 0); var _n{depth}_ int; if _n{depth}_, {err} = {bufName}.ReadSize(); {err} != nil {{ {err} = errors.New(""error""); return}}; for i{depth} := 0 ; i{depth} < _n{depth}_ ; i{depth}++ {{ var _e{depth}_ {elementType.Apply(DeclaringTypeNameVisitor.Ins)}; {elementType.Apply(DeserializeBinVisitor.Ins, $@"_e{depth}_", bufName, err, depth +1)}; {fieldName} = append({fieldName}, _e{depth}_) }} }}";
+        return
+            $@"{{{fieldName} = make([]{elementType.Apply(DeclaringTypeNameVisitor.Ins)}, 0); var _n{depth}_ int; if _n{depth}_, {err} = {bufName}.ReadSize(); {err} != nil {{ {err} = errors.New(""error""); return}}; for i{depth} := 0 ; i{depth} < _n{depth}_ ; i{depth}++ {{ var _e{depth}_ {elementType.Apply(DeclaringTypeNameVisitor.Ins)}; {elementType.Apply(DeserializeBinVisitor.Ins, $@"_e{depth}_", bufName, err, depth + 1)}; {fieldName} = append({fieldName}, _e{depth}_) }} }}";
     }
 
     public string Accept(TArray type, string fieldName, string bufName, string err, int depth)
@@ -85,6 +91,7 @@ public class BinUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, 
 
     public string Accept(TMap type, string fieldName, string bufName, string err, int depth)
     {
-        return $@"{{ {fieldName} = make({type.Apply(DeclaringTypeNameVisitor.Ins)}); var _n{depth}_ int; if _n{depth}_, {err} = {bufName}.ReadSize(); {err} != nil {{ {err} = errors.New(""error""); return}}; for i{depth} := 0 ; i{depth} < _n{depth}_ ; i{depth}++ {{ var _key{depth}_ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.KeyType.Apply(DeserializeBinVisitor.Ins, $@"_key{depth}_", bufName, err, depth + 1)}; var _value{depth}_ {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.ValueType.Apply(DeserializeBinVisitor.Ins, $@"_value{depth}_", bufName, err, depth + 1)}; {fieldName}[_key{depth}_] = _value{depth}_}} }}";
+        return
+            $@"{{ {fieldName} = make({type.Apply(DeclaringTypeNameVisitor.Ins)}); var _n{depth}_ int; if _n{depth}_, {err} = {bufName}.ReadSize(); {err} != nil {{ {err} = errors.New(""error""); return}}; for i{depth} := 0 ; i{depth} < _n{depth}_ ; i{depth}++ {{ var _key{depth}_ {type.KeyType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.KeyType.Apply(DeserializeBinVisitor.Ins, $@"_key{depth}_", bufName, err, depth + 1)}; var _value{depth}_ {type.ValueType.Apply(DeclaringTypeNameVisitor.Ins)}; {type.ValueType.Apply(DeserializeBinVisitor.Ins, $@"_value{depth}_", bufName, err, depth + 1)}; {fieldName}[_key{depth}_] = _value{depth}_}} }}";
     }
 }

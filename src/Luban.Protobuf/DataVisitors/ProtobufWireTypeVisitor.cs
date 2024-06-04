@@ -53,6 +53,11 @@ public class ProtobufWireTypeVisitor : ITypeFuncVisitor<WireFormat.WireType>
         return WireFormat.WireType.LengthDelimited;
     }
 
+    public WireFormat.WireType Accept(TLang type)
+    {
+        return WireFormat.WireType.LengthDelimited;
+    }
+
     public WireFormat.WireType Accept(TDateTime type)
     {
         return WireFormat.WireType.Varint;
