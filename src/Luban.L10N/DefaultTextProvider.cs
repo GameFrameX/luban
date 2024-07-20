@@ -58,12 +58,9 @@ public class DefaultTextProvider : ITextProvider
         return _texts.TryGetValue(key, out text);
     }
 
-    private void LoadTextListFromFile(string fileName)
+    private void LoadTextListFromFile(string fileNameArray)
     {
-        var ass = new DefAssembly(new RawAssembly()
-        {
-            Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } },
-        }, "default", new List<string>(), null);
+        var ass = new DefAssembly(new RawAssembly() { Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } }, }, "default", new List<string>(), null);
 
 
         var rawFields = new List<RawField> { new() { Name = _keyFieldName, Type = "string" }, };
@@ -71,6 +68,7 @@ public class DefaultTextProvider : ITextProvider
         {
             rawFields.Add(new() { Name = _ValueFieldName, Type = "string" });
         }
+
         var defTableRecordType = new DefBean(new RawBean()
         {
             Namespace = "__intern__",
@@ -80,10 +78,7 @@ public class DefaultTextProvider : ITextProvider
             IsValueType = false,
             Sep = "",
             Fields = rawFields,
-        })
-        {
-            Assembly = ass,
-        };
+        }) { Assembly = ass, };
 
         ass.AddType(defTableRecordType);
         defTableRecordType.PreCompile();
@@ -91,25 +86,32 @@ public class DefaultTextProvider : ITextProvider
         defTableRecordType.PostCompile();
         var tableRecordType = TBean.Create(false, defTableRecordType, null);
 
-        (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileName));
-        var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
 
-        foreach (var r in records)
+        var fileNameList = fileNameArray.Split(new string[] { ",", "+" }, StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var fileName in fileNameList)
         {
-            DBean data = r.Data;
+            (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileName));
+            var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
 
-            string key = ((DString)data.GetField(_keyFieldName)).Value;
-            string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
-            if (string.IsNullOrEmpty(key))
+            foreach (var r in records)
             {
-                s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
-                continue;
+                DBean data = r.Data;
+
+                string key = ((DString)data.GetField(_keyFieldName)).Value;
+                string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
+                if (string.IsNullOrEmpty(key))
+                {
+                    s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
+                    continue;
+                }
+
+                if (!_texts.TryAdd(key, value))
+                {
+                    s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
+                }
             }
-            if (!_texts.TryAdd(key, value))
-            {
-                s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
-            }
-        };
+        }
     }
 
     public void AddUnknownKey(string key)
@@ -126,7 +128,7 @@ public class DefaultTextProvider : ITextProvider
             {
                 foreach (var record in GenerationContext.Current.GetTableAllDataList(table))
                 {
-                    record.Data = (DBean)record.Data.Apply(trans,table.ValueTType);
+                    record.Data = (DBean)record.Data.Apply(trans, table.ValueTType);
                 }
             }
         }
