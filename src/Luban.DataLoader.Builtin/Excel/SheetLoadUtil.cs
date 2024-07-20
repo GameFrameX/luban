@@ -225,7 +225,7 @@ public static class SheetLoadUtil
         string titleName = attrs[0];
         var tags = new Dictionary<string, string>();
         // *  开头的表示是多行
-        if (titleName.StartsWith("*"))
+        if (titleName.StartsWith('*'))
         {
             titleName = titleName.Substring(1);
             tags.Add("multi_rows", "1");
@@ -235,7 +235,7 @@ public static class SheetLoadUtil
         //    titleName = titleName.Substring(0, titleName.Length - 1);
         //    tags.Add("multi_rows", "1");
         //}
-        if (titleName.StartsWith("!"))
+        if (titleName.StartsWith('!'))
         {
             titleName = titleName.Substring(1);
             tags.Add("non_empty", "1");
@@ -320,6 +320,8 @@ public static class SheetLoadUtil
 
             Title subTitle;
             // [field,,,, field] 形成多列字段
+
+
             if (titleName.StartsWith('['))
             {
                 int startIndex = i;
@@ -473,7 +475,7 @@ public static class SheetLoadUtil
         return row.All(c => string.IsNullOrWhiteSpace(c.Value?.ToString()));
     }
 
-    const int maxEmptyRowCountOfInterruptParse = 10;
+    const int maxEmptyRowCount = 300;
 
     private static List<List<Cell>> ParseRawSheetContent(IExcelDataReader reader, bool orientRow, bool headerOnly)
     {
@@ -484,7 +486,7 @@ public static class SheetLoadUtil
         // 3. 跳过null或者empty的单元格
         var originRows = new List<List<Cell>>();
         int rowIndex = 0;
-        int consecutiveEmptyRowCount = 0;
+        int emptyRowCount = 0;
         do
         {
             var row = new List<Cell>();
@@ -492,24 +494,22 @@ public static class SheetLoadUtil
             {
                 row.Add(new Cell(rowIndex, i, reader.GetValue(i)));
             }
-            originRows.Add(row);
-            if (orientRow && headerOnly && !IsHeaderRow(row))
-            {
-                break;
-            }
             ++rowIndex;
             if (IsEmptyRow(row))
             {
-                ++consecutiveEmptyRowCount;
-                if (consecutiveEmptyRowCount > maxEmptyRowCountOfInterruptParse)
+                ++emptyRowCount;
+                if (emptyRowCount == maxEmptyRowCount)
                 {
-                    s_logger.Error("excel:{filename} sheet:{sheet} 连续空行超过{}行，可能是数据错误，解析中断", s_curExcel.Value, reader.Name, maxEmptyRowCountOfInterruptParse);
-                    break;
+                    s_logger.Warn("excel:{filename} sheet:{sheet} 连续空行超过{}行，删除这些空行可以提升导出性能", s_curExcel.Value, reader.Name, maxEmptyRowCount);
                 }
             }
             else
             {
-                consecutiveEmptyRowCount = 0;
+                originRows.Add(row);
+            }
+            if (orientRow && headerOnly && !IsHeaderRow(row))
+            {
+                break;
             }
         } while (reader.Read());
 
