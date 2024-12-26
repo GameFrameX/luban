@@ -4,7 +4,6 @@ using Luban.Defs;
 using Luban.RawDefs;
 using Luban.Types;
 using Luban.Utils;
-using System.Linq;
 
 namespace Luban.L10N;
 
@@ -58,7 +57,7 @@ public class DefaultTextProvider : ITextProvider
         return _texts.TryGetValue(key, out text);
     }
 
-    private void LoadTextListFromFile(string fileNameArray)
+    private void LoadTextListFromFile(string path)
     {
         var ass = new DefAssembly(new RawAssembly() { Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } }, }, "default", new List<string>(), null,
                                   null);
@@ -87,11 +86,31 @@ public class DefaultTextProvider : ITextProvider
         var tableRecordType = TBean.Create(false, defTableRecordType, null);
 
 
-        var fileNameList = fileNameArray.Split(new string[] { ",", "+" }, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var fileName in fileNameList)
+        DirectoryInfo directoryInfo = new DirectoryInfo(path);
+        if (!directoryInfo.Exists)
         {
-            (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileName));
+            s_logger.Error($"path:{path} is not a directory. ignore it! return");
+            return;
+        }
+
+        var excelExts = new HashSet<string> { "xlsx", "xls", "xlsm", "csv" };
+
+        var fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
+        foreach (var fileInfo in fileInfos)
+        {
+            if (FileUtil.IsIgnoreFile(fileInfo.Name))
+            {
+                continue;
+            }
+
+            string fileName = Path.GetFileName(fileInfo.Name);
+            string ext = Path.GetExtension(fileName).TrimStart('.');
+            if (!excelExts.Contains(ext))
+            {
+                continue;
+            }
+
+            (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileInfo.FullName));
             var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
 
             foreach (var r in records)
