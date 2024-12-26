@@ -4,6 +4,7 @@ using Luban.Defs;
 using Luban.RawDefs;
 using Luban.Types;
 using Luban.Utils;
+using System.Linq;
 
 namespace Luban.L10N;
 
@@ -57,17 +58,19 @@ public class DefaultTextProvider : ITextProvider
         return _texts.TryGetValue(key, out text);
     }
 
-    private void LoadTextListFromFile(string path)
+    private void LoadTextListFromFile(string fileName)
     {
-        var ass = new DefAssembly(new RawAssembly() { Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } }, }, "default", new List<string>(), null,
-                                  null);
+        var ass = new DefAssembly(new RawAssembly()
+        {
+            Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } },
+        }, "default", new List<string>(), null, null);
+
 
         var rawFields = new List<RawField> { new() { Name = _keyFieldName, Type = "string" }, };
         if (_convertTextKeyToValue)
         {
             rawFields.Add(new() { Name = _ValueFieldName, Type = "string" });
         }
-
         var defTableRecordType = new DefBean(new RawBean()
         {
             Namespace = "__intern__",
@@ -77,7 +80,10 @@ public class DefaultTextProvider : ITextProvider
             IsValueType = false,
             Sep = "",
             Fields = rawFields,
-        }) { Assembly = ass, };
+        })
+        {
+            Assembly = ass,
+        };
 
         ass.AddType(defTableRecordType);
         defTableRecordType.PreCompile();
@@ -85,52 +91,25 @@ public class DefaultTextProvider : ITextProvider
         defTableRecordType.PostCompile();
         var tableRecordType = TBean.Create(false, defTableRecordType, null);
 
+        (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileName));
+        var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
 
-        DirectoryInfo directoryInfo = new DirectoryInfo(path);
-        if (!directoryInfo.Exists)
+        foreach (var r in records)
         {
-            s_logger.Error($"path:{path} is not a directory. ignore it! return");
-            return;
-        }
+            DBean data = r.Data;
 
-        var excelExts = new HashSet<string> { "xlsx", "xls", "xlsm", "csv" };
-
-        var fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
-        foreach (var fileInfo in fileInfos)
-        {
-            if (FileUtil.IsIgnoreFile(fileInfo.Name))
+            string key = ((DString)data.GetField(_keyFieldName)).Value;
+            string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
+            if (string.IsNullOrEmpty(key))
             {
+                s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
                 continue;
             }
-
-            string fileName = Path.GetFileName(fileInfo.Name);
-            string ext = Path.GetExtension(fileName).TrimStart('.');
-            if (!excelExts.Contains(ext))
+            if (!_texts.TryAdd(key, value))
             {
-                continue;
+                s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
             }
-
-            (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileInfo.FullName));
-            var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
-
-            foreach (var r in records)
-            {
-                DBean data = r.Data;
-
-                string key = ((DString)data.GetField(_keyFieldName)).Value;
-                string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
-                if (string.IsNullOrEmpty(key))
-                {
-                    s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
-                    continue;
-                }
-
-                if (!_texts.TryAdd(key, value))
-                {
-                    s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
-                }
-            }
-        }
+        };
     }
 
     public void AddUnknownKey(string key)
@@ -147,7 +126,7 @@ public class DefaultTextProvider : ITextProvider
             {
                 foreach (var record in GenerationContext.Current.GetTableAllDataList(table))
                 {
-                    record.Data = (DBean)record.Data.Apply(trans, table.ValueTType);
+                    record.Data = (DBean)record.Data.Apply(trans,table.ValueTType);
                 }
             }
         }
