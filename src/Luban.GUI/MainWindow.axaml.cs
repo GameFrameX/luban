@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Controls;
-using Avalonia.Controls.Converters;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Luban.GUI.Models;
@@ -27,10 +25,13 @@ public partial class MainWindow : Window
         Console.SetOut(stringWriter);
         timer = new DispatcherTimer
         {
-            Interval = TimeSpan.FromMilliseconds(100), // 每100毫秒检查一次
+            Interval = TimeSpan.FromMilliseconds(200), // 每100毫秒检查一次
         };
         timer.Tick += Timer_Tick;
         SettingData.LoadSetting();
+        // LogHighlightingDefinition logHighlightingDefinition = new LogHighlightingDefinition(HighlightingManager.Instance);
+        // ErrorLog.SyntaxHighlighting = logHighlightingDefinition;
+
         var options = SettingData.Instance.Options;
         if (options != null)
         {
@@ -96,9 +97,9 @@ public partial class MainWindow : Window
             LauncherHelper.Start(args);
         });
 
-        await Task.Delay(200);
-        End();
+        await Task.Delay(300);
         timer.Stop();
+        End();
     }
 
     /// <summary>
