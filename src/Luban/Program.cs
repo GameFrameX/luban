@@ -11,10 +11,8 @@ namespace Luban;
 
 internal static class Program
 {
-
     private class CommandOptions
     {
-
         [Option('s', "schemaCollector", Required = false, HelpText = "schema collector name")]
         public string SchemaCollector { get; set; } = "default";
 
@@ -72,7 +70,7 @@ internal static class Program
 
     private static ILogger s_logger;
 
-    private static void Main(string[] args)
+    internal static void Main(string[] args)
     {
         CommandOptions opts = ParseArgs(args);
         SetupApp(opts);
@@ -85,6 +83,13 @@ internal static class Program
         {
             RunOnce(opts);
         }
+    }
+
+    internal static void Run(string[] args)
+    {
+        var opts = ParseArgs(args);
+        SetupApp(opts);
+        RunGeneration(opts, false);
     }
 
     private static void RunOnce(CommandOptions opts)
@@ -105,6 +110,7 @@ internal static class Program
                 s_anyChange = false;
                 RunGeneration(opts, false);
             }
+
             Thread.Sleep(1000);
         }
     }
@@ -129,6 +135,7 @@ internal static class Program
                 s_logger.Error("encounter some validation failure. exit code: 1");
                 Environment.Exit(1);
             }
+
             s_logger.Info("bye~");
         }
         catch (Exception e)
@@ -155,6 +162,7 @@ internal static class Program
             s_logger.Error($"=======================================================================");
             return;
         }
+
         do
         {
             s_logger.Error("===> {}", e.Message);
@@ -188,6 +196,7 @@ internal static class Program
                 return true;
             }
         }
+
         extract = null;
         return false;
     }
@@ -215,6 +224,7 @@ internal static class Program
             Console.Error.WriteLine(helpWriter.ToString());
             Environment.Exit(1);
         }
+
         return ((Parsed<CommandOptions>)result).Value;
     }
 
@@ -226,6 +236,7 @@ internal static class Program
         {
             return result;
         }
+
         foreach (var arg in xargs)
         {
             string[] pair = arg.Split('=', 2);
@@ -239,6 +250,7 @@ internal static class Program
                 throw new Exception($"duplicate xargs:{arg}");
             }
         }
+
         return result;
     }
 
@@ -250,6 +262,7 @@ internal static class Program
         {
             defaultXargsMap[kv.Key] = kv.Value;
         }
+
         return defaultXargsMap;
     }
 
@@ -260,6 +273,7 @@ internal static class Program
         {
             return result;
         }
+
         foreach (var variant in variants)
         {
             string[] pair = variant.Split('=', 2);
@@ -273,6 +287,7 @@ internal static class Program
                 throw new Exception($"duplicate variant:{variant}");
             }
         }
+
         return result;
     }
 
@@ -297,7 +312,7 @@ internal static class Program
     private static void SetupApp(CommandOptions opts)
     {
         ConsoleUtil.EnableQuickEditMode(false);
-        Console.OutputEncoding = Encoding.UTF8;
+        // Console.OutputEncoding = Encoding.UTF8;
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         int processorCount = Environment.ProcessorCount;

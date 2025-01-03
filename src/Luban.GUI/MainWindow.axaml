@@ -1,0 +1,113 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="600"
+        x:Class="Luban.GUI.MainWindow"
+        CanResize="False"
+        WindowState="Normal"
+        Icon="./Assets/logo.ico"
+        Title="Luban.GameFrameX.GUI">
+
+    <StackPanel Margin="20" Orientation="Vertical">
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Vertical">
+                <!-- 客户端数据存储路径 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="客户端数据存储路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="ClientOutputDataDir" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- 客户端代码存储路径 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="客户端代码存储路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="ClientOutputCodeDir" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="客户端本地化路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="ClientLocalizationDir" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Margin="20,0,0,0" Orientation="Vertical">
+                <!-- LuBan 配置文件路径 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="LuBan文件路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="LuBanPath" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- 服务器数据存储路径 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="服务器数据存储路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="ServerOutputDataDir" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- 服务器代码存储路径 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0">
+                    <TextBlock Text="服务器代码存储路径：" Width="150" VerticalAlignment="Center" />
+                    <TextBox Name="ServerOutputCodeDir" Width="330" VerticalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <!-- 第五行 -->
+        <!-- <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,10,0,0"> -->
+        <!--     <TextBlock Text="生成错误码?：" Width="128" VerticalAlignment="Center" /> -->
+        <!--     <CheckBox Name="IsGenerateErrorCode" VerticalAlignment="Center" IsChecked="True" /> -->
+        <!--     <StackPanel Width="200"></StackPanel> -->
+        <!--     <Button -->
+        <!--         Click="HelpButton_OnClick" -->
+        <!--         Content="帮助文档" -->
+        <!--         Foreground="DarkBlue" /> -->
+        <!-- </StackPanel> -->
+        <StackPanel Orientation="Horizontal" Margin="0,10,0,0" VerticalAlignment="Center">
+            <Button
+                Click="GenerateClientJsonButton_OnClick"
+                Name="GenerateClientJsonButton"
+                Content="客户端Json"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="30"
+                Width="200"
+                Height="50" />
+            <StackPanel Width="30" />
+            <Button
+                Click="GenerateClientBinaryButton_OnClick"
+                Name="GenerateClientBinaryButton"
+                Content="客户端二进制"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="30"
+                Width="200"
+                Height="50" />
+            <StackPanel Width="120" />
+            <Button
+                Click="GenerateServerJsonButton_OnClick"
+                Name="GenerateServerJsonButton"
+                Content="服务器Json"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="30"
+                Width="200"
+                Height="50" />
+            <StackPanel Width="30" />
+            <Button
+                Click="GenerateServerBinaryButton_OnClick"
+                Name="GenerateServerBinaryButton"
+                Content="服务器二进制"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="30"
+                Width="200"
+                Height="50" />
+        </StackPanel>
+        <StackPanel>
+            <Border Background="AliceBlue" Width="1000" Height="380" Margin="0,20,0,0">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Name="ErrorLogScroll">
+                    <StackPanel>
+                        <TextBox
+                            TextWrapping="NoWrap"
+                            Name="ErrorLog"
+                            Height="380"
+                            VerticalAlignment="Center" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</Window>
