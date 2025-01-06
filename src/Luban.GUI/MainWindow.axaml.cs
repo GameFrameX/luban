@@ -29,8 +29,7 @@ public partial class MainWindow : Window
         };
         timer.Tick += Timer_Tick;
         SettingData.LoadSetting();
-        // LogHighlightingDefinition logHighlightingDefinition = new LogHighlightingDefinition(HighlightingManager.Instance);
-        // ErrorLog.SyntaxHighlighting = logHighlightingDefinition;
+        ErrorLog.SyntaxHighlighting = new LogHighlightingDefinition();
 
         var options = SettingData.Instance.Options;
         if (options != null)
