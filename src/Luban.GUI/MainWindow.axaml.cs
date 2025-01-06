@@ -56,7 +56,7 @@ public partial class MainWindow : Window
     {
         Process.Start(new ProcessStartInfo
         {
-            FileName = "https://gameframex.doc.alianblank.com/tools/proto/launcher-params.html", UseShellExecute = true // 使用系统外壳来打开 URL
+            FileName = "https://gameframex.doc.alianblank.com/config/gui.html", UseShellExecute = true // 使用系统外壳来打开 URL
         });
     }
 
