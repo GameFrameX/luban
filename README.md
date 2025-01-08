@@ -58,9 +58,9 @@ luban标准化了游戏配置开发工作流，可以极大提升策划和程序
 
 #### 说明
 
-格式 #[任意字母]-[导出的表名称]-[表名称注释].xlsx
+格式 [任意字母]-[导出的表名称]-[表名称注释].xlsx
 
-表格以`#` 可以接任意字母开头。
+表格以任意字母-开头。
 
 中间部分的表名称为英文且不能有空格可以有下划线
 
@@ -68,15 +68,15 @@ luban标准化了游戏配置开发工作流，可以极大提升策划和程序
 
 #### 示例
 
-#L-Localization.xlsx => `Tb`Localization
+L-Localization.xlsx => `Tb`Localization
 
-#C-Achievement-成就表.xlsx => `Tb`Achievement
+C-Achievement-成就表.xlsx => `Tb`Achievement
 
-#C-Achievement-成就表-AAA.xlsx => `Tb`Achievement
+C-Achievement-成就表-AAA.xlsx => `Tb`Achievement
 
-#C-Achievement-成就表-AAA-BBB.xlsx => `Tb`Achievement
+C-Achievement-成就表-AAA-BBB.xlsx => `Tb`Achievement
 
-#C-Achievement-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement
+C-Achievement-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement
 
 ## 文档
 
