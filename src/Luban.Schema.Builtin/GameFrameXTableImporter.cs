@@ -19,7 +19,7 @@ public class GameFrameXTableImporter : ITableImporter
     {
         string dataDir = GenerationContext.GlobalConf.InputDataDir;
 
-        string fileNamePatternStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "filePattern", false, "#(.*)");
+        string fileNamePatternStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "filePattern", false, "([a-zA-Z0-9]-.+)");
         string tableNamespaceFormatStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "tableNamespaceFormat", false, "{0}");
         string tableNameFormatStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "tableNameFormat", false, "Tb{0}");
         string valueTypeNameFormatStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "valueTypeNameFormat", false, "{0}");
@@ -62,7 +62,7 @@ public class GameFrameXTableImporter : ITableImporter
 
             if (IsContainsZhCn(rawTableFullName))
             {
-                throw new Exception($"不支持中文表名:[{rawTableFullName}] 文件名:[{fileName}] 表名称定义规范为: #排序编号-导出表名-中文标识名称");
+                throw new Exception($"不支持中文表名:[{rawTableFullName}] 文件名:[{fileName}] 表名称定义规范为: 排序编号-导出表名-中文标识名称");
             }
 
             string rawTableNamespace = TypeUtil.GetNamespace(rawTableFullName);
