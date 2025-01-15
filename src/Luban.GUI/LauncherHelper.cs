@@ -78,12 +78,7 @@ internal static class LauncherHelper
     {
         CommandOptions opts = ParseArgs(args);
         SetupApp(opts);
-        RunOnce(opts);
-    }
-
-    private static void RunOnce(CommandOptions opts)
-    {
-        RunGeneration(opts, true);
+        RunGeneration(opts, false);
     }
 
     private static void RunGeneration(CommandOptions opts, bool exitOnError)
