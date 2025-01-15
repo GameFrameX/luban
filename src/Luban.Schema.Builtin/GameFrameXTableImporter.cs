@@ -71,6 +71,22 @@ public class GameFrameXTableImporter : ITableImporter
             string tableName = string.Format(tableNameFormatStr, rawTableName);
             string valueTypeFullName = TypeUtil.MakeFullName(tableNamespace, string.Format(valueTypeNameFormatStr, rawTableName));
 
+            bool isExist = false;
+            foreach (var rawTable in tables)
+            {
+                if (rawTable.Namespace == tableNamespace && rawTable.Name == tableName)
+                {
+                    rawTable.InputFiles.Add(relativePath);
+                    isExist = true;
+                    break;
+                }
+            }
+
+            if (isExist)
+            {
+                continue;
+            }
+
             var table = new RawTable()
             {
                 Namespace = tableNamespace,
