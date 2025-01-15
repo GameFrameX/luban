@@ -47,9 +47,16 @@ public partial class MainWindow : Window
     private void Timer_Tick(object sender, EventArgs e)
     {
         // 捕捉 Console 输出
-        var output = stringWriter.ToString();
-        ErrorLog.Text = output;
-        ErrorLogScroll.ScrollToEnd();
+        try
+        {
+            var output = stringWriter.ToString();
+            ErrorLog.Text = output;
+            ErrorLogScroll.ScrollToEnd();
+        }
+        catch (Exception exception)
+        {
+            // Console.WriteLine(exception);
+        }
     }
 
     private void HelpButton_OnClick(object sender, RoutedEventArgs e)
