@@ -96,17 +96,24 @@ public partial class MainWindow : Window
 
     private async Task Run(string[] args)
     {
-        stringWriter.GetStringBuilder().Clear();
-        timer.Start();
-        Start();
-        await Task.Run(() =>
+        try
         {
-            LauncherHelper.Start(args);
-        });
+            stringWriter.GetStringBuilder().Clear();
+            timer.Start();
+            Start();
+            await Task.Run(() =>
+            {
+                LauncherHelper.Start(args);
+            });
 
-        await Task.Delay(300);
-        timer.Stop();
-        End();
+            await Task.Delay(300);
+            timer.Stop();
+            End();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 
     /// <summary>
