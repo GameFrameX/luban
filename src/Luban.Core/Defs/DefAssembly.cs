@@ -153,7 +153,7 @@ public class DefAssembly
         }
         if (!TablesByName.TryAdd(table.Name, table))
         {
-            throw new Exception($"table:'{table.FullName} 与 table:'{TablesByName[table.Name].FullName}' 的表名重复(不同模块下也不允许定义同名表，将来可能会放开限制)");
+            s_logger.Fatal($"table:'{table.FullName} 与 table:'{TablesByName[table.Name].FullName}' 的表名重复(不同模块下也不允许定义同名表，将来可能会放开限制),请查看__tables__.xlsx文件中是否重复引入");
         }
     }
 
