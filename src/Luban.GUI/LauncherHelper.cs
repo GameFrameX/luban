@@ -298,6 +298,7 @@ internal static class LauncherHelper
         s_logger.Info(" ==========================================================================================");
         s_logger.Info("");
         s_logger.Info("  Luban is developed by Code Philosophy Technology Co., LTD. https://code-philosophy.com");
+        s_logger.Info("  Luban is developed and modify by GameFrameX, LTD. https://gameframex.doc.alianblank.com");
         s_logger.Info("");
         s_logger.Info(" ==========================================================================================");
     }
