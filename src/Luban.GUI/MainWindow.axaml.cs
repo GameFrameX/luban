@@ -67,6 +67,7 @@ public partial class MainWindow : Window
         SettingData.Instance.Options.ClientCodeTarget = this.ClientOutputCodeDir.Text;
         SettingData.Instance.Options.ServerDataTarget = this.ServerOutputDataDir.Text;
         SettingData.Instance.Options.ServerCodeTarget = this.ServerOutputCodeDir.Text;
+        SettingData.Instance.Options.ClientLocalizationPath = this.ClientLocalizationDir.Text;
         SettingData.SaveSetting();
     }
 
