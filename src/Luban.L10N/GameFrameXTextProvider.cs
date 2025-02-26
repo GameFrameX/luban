@@ -98,7 +98,7 @@ public class GameFrameXTextProvider : ITextProvider
         var fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
         foreach (var fileInfo in fileInfos)
         {
-            if (FileUtil.IsIgnoreFile(fileInfo.Name))
+            if (FileUtil.IsIgnoreFile(path, fileInfo.Name))
             {
                 continue;
             }

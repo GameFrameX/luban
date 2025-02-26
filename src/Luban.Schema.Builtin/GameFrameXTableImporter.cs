@@ -29,7 +29,7 @@ public class GameFrameXTableImporter : ITableImporter
         var tables = new List<RawTable>();
         foreach (string file in Directory.GetFiles(dataDir, "*", SearchOption.AllDirectories))
         {
-            if (FileUtil.IsIgnoreFile(file))
+            if (FileUtil.IsIgnoreFile(dataDir, file))
             {
                 continue;
             }
