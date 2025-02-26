@@ -122,7 +122,7 @@ internal static class Program
             IConfigLoader rootLoader = new GlobalConfigLoader();
             var config = rootLoader.Load(opts.ConfigFile);
             GenerationContext.GlobalConf = config;
-
+            GenerationContext.SetTargetName(opts.Target);
 
             var launcher = new SimpleLauncher();
             launcher.Start(ParseXargs(config.Xargs, opts.Xargs));

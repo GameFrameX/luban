@@ -110,6 +110,7 @@ public class GenerationContext
         {
             return;
         }
+
         var children = new List<DefBean>(bean.Children);
         children.Sort((a, b) => a.FullName.CompareTo(b.FullName));
         foreach (var child in children)
@@ -133,6 +134,7 @@ public class GenerationContext
                 AddChildrenByOrder(sortedBeans, bean);
             }
         }
+
         Debug.Assert(types.Count == sortedBeans.Count);
         return sortedBeans;
     }
@@ -143,6 +145,7 @@ public class GenerationContext
         {
             return _exportEmptyGroupsTypes;
         }
+
         return groups.Any(Target.Groups.Contains);
     }
 
@@ -183,8 +186,8 @@ public class GenerationContext
     {
         s_logger.Debug("AddDataTable name:{} record count:{}", table.FullName, mainRecords.Count);
         _recordsByTables[table.FullName] = new TableDataInfo(table,
-            mainRecords.Where(r => r.IsNotFiltered(IncludeTags, ExcludeTags)).ToList(),
-            patchRecords != null ? patchRecords.Where(r => r.IsNotFiltered(IncludeTags, ExcludeTags)).ToList() : null);
+                                                             mainRecords.Where(r => r.IsNotFiltered(IncludeTags, ExcludeTags)).ToList(),
+                                                             patchRecords != null ? patchRecords.Where(r => r.IsNotFiltered(IncludeTags, ExcludeTags)).ToList() : null);
     }
 
     public List<Record> GetTableAllDataList(DefTable table)
@@ -220,6 +223,7 @@ public class GenerationContext
                 }
             });
         }
+
         return sortedRecords;
     }
 
@@ -234,6 +238,7 @@ public class GenerationContext
         {
             return CodeFormatManager.Ins.GetCodeStyle(codeStyleName);
         }
+
         return null;
     }
 
@@ -289,4 +294,11 @@ public class GenerationContext
             }
         }
     }
+
+    public static void SetTargetName(string targetName)
+    {
+        TargetName = targetName;
+    }
+
+    public static string TargetName { get; private set; }
 }
