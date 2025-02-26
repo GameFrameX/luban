@@ -1,12 +1,7 @@
 ﻿using Luban.Defs;
 using Luban.RawDefs;
 using Luban.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Luban.Schema.Builtin;
 
@@ -18,6 +13,9 @@ public class GameFrameXTableImporter : ITableImporter
     public List<RawTable> LoadImportTables()
     {
         string dataDir = GenerationContext.GlobalConf.InputDataDir;
+        var groups = GenerationContext.GlobalConf.Groups;
+        var targets = GenerationContext.GlobalConf.Targets;
+        var exportTarget = targets.Find(m => m.Name == GenerationContext.TargetName);
 
         string fileNamePatternStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "filePattern", false, "([a-zA-Z0-9]-.+)");
         string tableNamespaceFormatStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "tableNamespaceFormat", false, "{0}");
@@ -59,6 +57,28 @@ public class GameFrameXTableImporter : ITableImporter
                 // 获取中间的值
                 rawTableFullName = split[1];
             }
+
+            if (split.Length > 2)
+            {
+                string groupName = split[2].Trim().ToLower();
+                if (!string.IsNullOrEmpty(groupName) && !IsContainsZhCn(groupName))
+                {
+                    // 判断是否在组中
+                    bool isExistGroup = groups.Any(group => group.Names.Contains(groupName));
+
+                    if (isExistGroup)
+                    {
+                        // 判断是否导出
+                        bool isExport = exportTarget.Groups.Any(targetGroupName => targetGroupName.Equals(groupName, StringComparison.OrdinalIgnoreCase));
+
+                        if (!isExport)
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+
 
             if (IsContainsZhCn(rawTableFullName))
             {
