@@ -58,15 +58,19 @@ luban标准化了游戏配置开发工作流，可以极大提升策划和程序
 
 #### 说明
 
-格式 [任意字母]-[导出的表名称]-[表名称注释].xlsx
+格式 [任意字母]-[导出的表名称]-[导出的组名]-[表名称注释].xlsx
 
 表格以任意字母-开头。
 
 中间部分的表名称为英文且不能有空格可以有下划线
 
+导出的组名称必须是定义的`s`、 `c` 之一，可选
+
 后面表名称注释可以接任意长度。程序只取第一个`-` 和第二个`-` 之间的内容加上 `Tb` 为最终表名称。
 
 #### 示例
+
+##### 导出的表名称
 
 L-Localization.xlsx => `Tb`Localization
 
@@ -77,6 +81,16 @@ C-Achievement-成就表-AAA.xlsx => `Tb`Achievement
 C-Achievement-成就表-AAA-BBB.xlsx => `Tb`Achievement
 
 C-Achievement-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement
+
+##### 导出的组表名称
+
+C-Achievement-s-成就表.xlsx => `Tb`Achievement, 当前导出目标为 `s` 时才会导出
+
+C-Achievement-c-成就表-AAA.xlsx => `Tb`Achievement, 当前导出目标为 `c` 时才会导出
+
+C-Achievement-s-成就表-AAA-BBB.xlsx => `Tb`Achievement, 当前导出目标为 `s` 时才会导出
+
+C-Achievement-c-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement, 当前导出目标为 `c` 时才会导出
 
 ## 文档
 
