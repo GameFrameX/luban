@@ -15,6 +15,8 @@ public class GameFrameXTableImporter : ITableImporter
         string dataDir = GenerationContext.GlobalConf.InputDataDir;
         var groups = GenerationContext.GlobalConf.Groups;
         var targets = GenerationContext.GlobalConf.Targets;
+        var excludePaths = GenerationContext.ExcludePaths;
+        s_logger.Info("exclude paths: " + string.Join(",", excludePaths));
         var exportTarget = targets.Find(m => m.Name == GenerationContext.TargetName);
 
         string fileNamePatternStr = EnvManager.Current.GetOptionOrDefault("tableImporter", "filePattern", false, "([a-zA-Z0-9]-.+)");
@@ -28,6 +30,13 @@ public class GameFrameXTableImporter : ITableImporter
         foreach (string file in Directory.GetFiles(dataDir, "*", SearchOption.AllDirectories))
         {
             if (FileUtil.IsIgnoreFile(dataDir, file))
+            {
+                continue;
+            }
+
+            // 检查文件是否在排除路径中
+            string relativePath = file.Substring(dataDir.Length + 1).TrimStart('\\').TrimStart('/');
+            if (excludePaths?.Any(excludePath => relativePath.StartsWith(excludePath, StringComparison.OrdinalIgnoreCase)) == true)
             {
                 continue;
             }
@@ -46,7 +55,6 @@ public class GameFrameXTableImporter : ITableImporter
                 continue;
             }
 
-            string relativePath = file.Substring(dataDir.Length + 1).TrimStart('\\').TrimStart('/');
             string namespaceFromRelativePath = Path.GetDirectoryName(relativePath).Replace('/', '.').Replace('\\', '.');
 
             string rawTableFullName = match.Groups[1].Value;
@@ -78,7 +86,6 @@ public class GameFrameXTableImporter : ITableImporter
                     }
                 }
             }
-
 
             if (IsContainsZhCn(rawTableFullName))
             {
@@ -123,7 +130,6 @@ public class GameFrameXTableImporter : ITableImporter
             s_logger.Debug("import table file:{@}", table);
             tables.Add(table);
         }
-
 
         return tables;
     }

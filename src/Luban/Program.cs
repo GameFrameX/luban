@@ -58,6 +58,9 @@ internal static class Program
         [Option('x', "xargs", Required = false, HelpText = "args like -x a=1 -x b=2")]
         public IEnumerable<string> Xargs { get; set; }
 
+        [Option("excludePath", Required = false, HelpText = "-excludePath local\\ local\\ui\\")]
+        public IEnumerable<string> ExcludePaths { get; set; }
+
         [Option('l', "logConfig", Required = false, Default = "nlog.xml", HelpText = "nlog config file")]
         public string LogConfig { get; set; }
 
@@ -123,6 +126,7 @@ internal static class Program
             var config = rootLoader.Load(opts.ConfigFile);
             GenerationContext.GlobalConf = config;
             GenerationContext.SetTargetName(opts.Target);
+            GenerationContext.SetExcludePaths(opts.ExcludePaths);
 
             var launcher = new SimpleLauncher();
             launcher.Start(ParseXargs(config.Xargs, opts.Xargs));

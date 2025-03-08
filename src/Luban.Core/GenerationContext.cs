@@ -301,4 +301,21 @@ public class GenerationContext
     }
 
     public static string TargetName { get; private set; }
+    public static List<string> ExcludePaths { get; private set; }
+
+    public static void SetExcludePaths(IEnumerable<string> excludePaths)
+    {
+        if (excludePaths == null)
+        {
+            return;
+        }
+
+        var paths = excludePaths.ToList();
+        ExcludePaths = new List<string>(paths.Count);
+        foreach (var excludePath in paths)
+        {
+            var path = excludePath.Replace("/", "\\");
+            ExcludePaths.Add(path);
+        }
+    }
 }
