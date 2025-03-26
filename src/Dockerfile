@@ -25,7 +25,6 @@ COPY ["Luban.Protobuf/Luban.Protobuf.csproj", "Luban.Protobuf/"]
 COPY ["Luban.Python/Luban.Python.csproj", "Luban.Python/"]
 COPY ["Luban.Rust/Luban.Rust.csproj", "Luban.Rust/"]
 COPY ["Luban.Schema.Builtin/Luban.Schema.Builtin.csproj", "Luban.Schema.Builtin/"]
-COPY ["Luban.Typescript/Luban.Typescript.csproj", "Luban.Typescript/"]
 RUN dotnet restore "Luban/Luban.csproj"
 COPY . .
 WORKDIR "/src/Luban"
