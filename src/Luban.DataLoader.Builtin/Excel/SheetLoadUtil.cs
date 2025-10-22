@@ -381,6 +381,10 @@ public static class SheetLoadUtil
                 bool findEndPair = false;
                 for (++i; i <= title.ToIndex; i++)
                 {
+                    if (i >= titleRow.Count)
+                    {
+                        break;
+                    }
                     var endNamePair = titleRow[i].Value?.ToString()?.Trim();
                     if (string.IsNullOrEmpty(endNamePair))
                     {
@@ -666,7 +670,11 @@ public static class SheetLoadUtil
                     int notEmptyCellCount = 0;
                     for (int i = subTitle.FromIndex; i <= subTitle.ToIndex; i++)
                     {
-                        var cellValue = descRow?[i].Value?.ToString();
+                        if (i >= descRow.Count)
+                        {
+                            break;
+                        }
+                        var cellValue = descRow[i].Value?.ToString();
                         if (!string.IsNullOrWhiteSpace(cellValue))
                         {
                             ++notEmptyCellCount;
