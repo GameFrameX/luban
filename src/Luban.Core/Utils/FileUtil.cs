@@ -260,7 +260,7 @@ public static class FileUtil
         }
         else
         {
-            files.Add(fileOrDirectory);
+            files.Add(fileOrDirectory.Replace('\\', '/'));
         }
         return files;
     }
