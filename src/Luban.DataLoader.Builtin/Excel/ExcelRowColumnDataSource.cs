@@ -22,8 +22,8 @@ public class ExcelRowColumnDataSource : DataLoaderBase
     {
         s_logger.Trace("{} {}", rawUrl, sheetName);
         RawUrl = rawUrl;
-
-        foreach (RawSheet rawSheet in SheetLoadUtil.LoadRawSheets(rawUrl, sheetName, stream))
+        var rawSheets = SheetLoadUtil.LoadRawSheets(rawUrl, sheetName, stream);
+        foreach (RawSheet rawSheet in rawSheets)
         {
             var sheet = new RowColumnSheet(rawUrl, sheetName, rawSheet.SheetName);
             sheet.Load(rawSheet);
