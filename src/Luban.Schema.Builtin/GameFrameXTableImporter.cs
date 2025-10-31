@@ -57,6 +57,13 @@ public class GameFrameXTableImporter : ITableImporter
 
             string namespaceFromRelativePath = Path.GetDirectoryName(relativePath).Replace('/', '.').Replace('\\', '.');
 
+            // 获取第一个切片作为命名空间
+            var namespaceParts = namespaceFromRelativePath.Split(new string[] { "_", "-" }, StringSplitOptions.RemoveEmptyEntries);
+            if (namespaceParts.Length > 1)
+            {
+                namespaceFromRelativePath = namespaceParts.First();
+            }
+
             string rawTableFullName = match.Groups[1].Value;
             var split = rawTableFullName.Split(['-', '_',], StringSplitOptions.RemoveEmptyEntries);
             if (split.Length > 1)
