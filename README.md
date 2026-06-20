@@ -28,6 +28,45 @@ luban标准化了游戏配置开发工作流，可以极大提升策划和程序
 
 ## 修改和增加
 
+### 增加 split 代码生成目标
+
+在不破坏原有代码生成目标的前提下，新增一组以原目标名称追加 `-split` 后缀的代码生成目标。
+
+split 目标用于将生成代码拆分为更细粒度的文件：定义信息输出到面向阅读、审查和 AI 上下文使用的 Def 文件中，解析、加载和运行时代码保留在 Impl 或运行时文件中。这样在只关注单个配置类型时，可以读取对应的 Def 文件，而不需要读取完整的全量 schema 文件。
+
+命名规则：
+
+```
+原代码生成目标 + -split
+```
+
+已支持的 split 目标：
+
+| 语言 | 目标 |
+|:-----|:-----|
+| C# | `cs-simple-json-split`, `cs-bin-split`, `cs-dotnet-json-split`, `cs-dotnet-bin-split` |
+| Go | `go-json-split`, `go-bin-split` |
+| Rust | `rust-json-split`, `rust-bin-split` |
+| C++ | `cpp-rawptr-bin-split`, `cpp-sharedptr-bin-split` |
+| Java | `java-json-split`, `java-bin-split` |
+| TypeScript | `typescript-json-split`, `typescript-bin-split`, `typescript-protobuf-split` |
+| Python | `python-json-split` |
+| Lua | `lua-bin-split`, `lua-lua-split` |
+| PHP | `php-json-split` |
+| GDScript | `gdscript-json-split` |
+
+拆分规则按语言能力保持一致语义：
+
+- C#、Go、C++ 输出 Def/Impl 风格文件，便于区分定义上下文和运行时实现。
+- Java 由于不支持跨文件拆分同一个 public class，输出运行时类和 `XxxDef` 定义伴生类。
+- TypeScript、Python、Lua、PHP、GDScript 保留运行时 schema 文件，同时额外输出每个类型对应的 `*.def.*` 定义文件。
+
+本地验收脚本：
+
+```
+BASE=/tmp/luban-split-code-targets-acceptance scripts/accept-split-code-targets.sh
+```
+
 ### 增加本地化的文件夹配置支持
 
 在项目中。经常会出现语言表在协作的时候有冲突。这个时候就需要按照每个模块来做表格文件本身的分离，已经不是Sheet的分离的问题了。所以将本地化文件夹配置支持文件夹下的所有文件都识别为本地化文件。
