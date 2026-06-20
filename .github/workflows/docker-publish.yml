@@ -1,0 +1,135 @@
+name: Docker Publish
+
+on:
+  push:
+    tags:
+      - "[0-9]*.[0-9]*.[0-9]*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: gameframex-luban
+
+jobs:
+  docker-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read project version
+        id: version
+        run: |
+          VERSION="$(dotnet msbuild src/Luban/Luban.csproj -getProperty:Version)"
+          if [ -z "$VERSION" ]; then
+            echo "Version is empty"
+            exit 1
+          fi
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate release version
+        run: |
+          VERSION="${{ steps.version.outputs.value }}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version '$VERSION' is not a no-v SemVer release version"
+            exit 1
+          fi
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.ref_name }}" != "$VERSION" ]; then
+            echo "Git tag '${{ github.ref_name }}' does not match Version.props '$VERSION'"
+            exit 1
+          fi
+
+      - name: Normalize image owner
+        id: image
+        run: |
+          OWNER="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
+          echo "ghcr=ghcr.io/$OWNER/$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Validate registry settings
+        run: |
+          if [ -z "${{ secrets.DOCKERHUB_ORGANIZATION }}" ]; then
+            echo "DOCKERHUB_ORGANIZATION is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            echo "DOCKERHUB_USERNAME is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+            echo "DOCKERHUB_TOKEN is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_URL }}" ]; then
+            echo "ALIYUN_REGISTRY_URL is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_NAMESPACE }}" ]; then
+            echo "ALIYUN_NAMESPACE is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_USERNAME }}" ]; then
+            echo "ALIYUN_REGISTRY_USERNAME is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_PASSWORD }}" ]; then
+            echo "ALIYUN_REGISTRY_PASSWORD is required"
+            exit 1
+          fi
+          if [[ "${{ secrets.ALIYUN_REGISTRY_URL }}" =~ ^https?:// ]]; then
+            echo "ALIYUN_REGISTRY_URL should not include a URL scheme"
+            exit 1
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Aliyun Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ALIYUN_REGISTRY_URL }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            docker.io/${{ secrets.DOCKERHUB_ORGANIZATION }}/${{ env.IMAGE_NAME }}
+            ${{ steps.image.outputs.ghcr }}
+            ${{ secrets.ALIYUN_REGISTRY_URL }}/${{ secrets.ALIYUN_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ steps.version.outputs.value }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
