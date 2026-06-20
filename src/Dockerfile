@@ -6,6 +6,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Directory.Build.props", "."]
+COPY ["Version.props", "."]
 COPY ["Luban/Luban.csproj", "Luban/"]
 COPY ["Luban.Bson/Luban.Bson.csproj", "Luban.Bson/"]
 COPY ["Luban.Core/Luban.Core.csproj", "Luban.Core/"]
