@@ -1,9 +1,8 @@
-using Luban.CodeTarget;
-using Luban.CSharp.TypeVisitors;
+using Luban.Rust.TypeVisitors;
 using Luban.Types;
 using Scriban.Runtime;
 
-namespace Luban.CSharp.TemplateExtensions;
+namespace Luban.Rust.TemplateExtensions;
 
 public class RustBinTemplateExtension : ScriptObject
 {

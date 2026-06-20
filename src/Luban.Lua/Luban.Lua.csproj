@@ -15,13 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Templates\pb\schema.sbn">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Templates\lua-bin\schema.sbn">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="Templates\lua-lua\schema.sbn">
+      <None Update="Templates\**\*.sbn">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

@@ -14,6 +14,11 @@ public class TypescriptCommonTemplateExtension : ScriptObject
         return type.Apply(DeclaringTypeNameVisitor.Ins);
     }
 
+    public static string DeclaringDefTypeName(TType type)
+    {
+        return type.Apply(DefDeclaringTypeNameVisitor.Ins);
+    }
+
     public static string ClassModifier(DefBean bean)
     {
         return bean.IsAbstractType ? "abstract" : "sealed";

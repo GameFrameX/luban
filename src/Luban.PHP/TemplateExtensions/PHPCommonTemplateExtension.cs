@@ -1,5 +1,6 @@
 using Luban.CodeFormat;
 using Luban.Defs;
+using Luban.PHP.TypeVisitors;
 using Luban.Types;
 using Luban.Utils;
 using Scriban.Runtime;
@@ -11,6 +12,16 @@ public class PHPCommonTemplateExtension : ScriptObject
     public static string FullName(DefTypeBase type)
     {
         return TypeUtil.MakePyFullName(type.Namespace, type.Name);
+    }
+
+    public static string StrFullName(string fullName)
+    {
+        return fullName.Replace(".", "_");
+    }
+
+    public static string DeclaringDefTypeName(TType type)
+    {
+        return type.Apply(PHPDefTypeNameVisitor.Ins);
     }
 
     public static string ClassModifier(DefBean bean)

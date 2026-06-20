@@ -1,4 +1,5 @@
 ﻿using Luban.Types;
+using Luban.Rust.TemplateExtensions;
 using Luban.TypeVisitors;
 using Luban.Utils;
 
@@ -45,7 +46,7 @@ public class RustDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
 
     public string Accept(TEnum type)
     {
-        return $"crate::{(type.DefEnum.TypeNameWithTypeMapper() ?? type.DefEnum.FullName).Replace(".", "::")}";
+        return type.DefEnum.TypeNameWithTypeMapper() ?? RustCommonTemplateExtension.FullName(type.DefEnum);
     }
 
     public string Accept(TString type)
@@ -58,29 +59,29 @@ public class RustDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "u64";
     }
 
-    public string Accept(TBean type)
+    public virtual string Accept(TBean type)
     {
         return type.DefBean.IsAbstractType 
             ? "std::sync::Arc<AbstractBase>" 
-            : $"crate::{(type.DefBean.TypeNameWithTypeMapper() ?? type.DefBean.FullName).Replace(".", "::")}";
+            : type.DefBean.TypeNameWithTypeMapper() ?? RustCommonTemplateExtension.FullName(type.DefBean);
     }
 
-    public string Accept(TArray type)
+    public virtual string Accept(TArray type)
     {
         return $"Vec<{type.ElementType.Apply(this)}>";
     }
 
-    public string Accept(TList type)
+    public virtual string Accept(TList type)
     {
         return $"Vec<{type.ElementType.Apply(this)}>";
     }
 
-    public string Accept(TSet type)
+    public virtual string Accept(TSet type)
     {
         return $"std::collections::HashSet<{type.ElementType.Apply(this)}>";
     }
 
-    public string Accept(TMap type)
+    public virtual string Accept(TMap type)
     {
         return $"std::collections::HashMap<{type.KeyType.Apply(this)}, {type.ValueType.Apply(this)}>";
     }

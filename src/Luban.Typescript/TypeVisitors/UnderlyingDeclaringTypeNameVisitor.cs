@@ -52,7 +52,7 @@ public class UnderlyingDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return "string";
     }
 
-    public string Accept(TBean type)
+    public virtual string Accept(TBean type)
     {
         return type.DefBean.FullName;
     }

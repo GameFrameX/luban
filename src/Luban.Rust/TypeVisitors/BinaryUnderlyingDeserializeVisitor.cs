@@ -5,7 +5,7 @@ using Luban.Types;
 using Luban.TypeVisitors;
 using Luban.Utils;
 
-namespace Luban.CSharp.TypeVisitors;
+namespace Luban.Rust.TypeVisitors;
 
 public class BinaryUnderlyingDeserializeVisitor : ITypeFuncVisitor<string, string, int, string>
 {

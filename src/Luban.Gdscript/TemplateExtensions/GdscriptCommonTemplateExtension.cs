@@ -14,6 +14,11 @@ public class GdscriptCommonTemplateExtension : ScriptObject
         return type.Apply(DeclaringTypeNameVisitor.Ins);
     }
 
+    public static string DeclaringDefTypeName(TType type)
+    {
+        return type.Apply(DefDeclaringTypeNameVisitor.Ins);
+    }
+
     public static string FullName(DefTypeBase type)
     {
         return TypeUtil.MakeGDScriptFullName(type.Namespace, type.Name);

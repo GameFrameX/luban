@@ -59,27 +59,27 @@ public class JavaDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
         return type.IsNullable ? "Long" : "long";
     }
 
-    public string Accept(TBean type)
+    public virtual string Accept(TBean type)
     {
         return type.DefBean.TypeNameWithTypeMapper() ?? type.DefBean.FullNameWithTopModule;
     }
 
-    public string Accept(TArray type)
+    public virtual string Accept(TArray type)
     {
         return $"{type.ElementType.Apply(this)}[]";
     }
 
-    public string Accept(TList type)
+    public virtual string Accept(TList type)
     {
         return $"java.util.ArrayList<{type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)}>";
     }
 
-    public string Accept(TSet type)
+    public virtual string Accept(TSet type)
     {
         return $"java.util.HashSet<{type.ElementType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)}>";
     }
 
-    public string Accept(TMap type)
+    public virtual string Accept(TMap type)
     {
         return $"java.util.HashMap<{type.KeyType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)}, {type.ValueType.Apply(JavaDeclaringBoxTypeNameVisitor.Ins)}>";
     }

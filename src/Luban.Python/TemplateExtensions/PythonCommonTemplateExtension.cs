@@ -19,6 +19,11 @@ public class PythonCommonTemplateExtension : ScriptObject
         return fullName.Replace(".", "_");
     }
 
+    public static string DeclaringDefTypeName(TType type)
+    {
+        return type.Apply(DefDeclaringTypeNameVisitor.Ins);
+    }
+
     public static string Deserialize(string fieldName, string jsonVarName, TType type)
     {
         if (type.IsNullable)

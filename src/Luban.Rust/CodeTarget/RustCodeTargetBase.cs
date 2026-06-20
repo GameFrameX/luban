@@ -72,7 +72,7 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
             Task.Run(() =>
             {
                 var allns = modDic.Values.Select(x => "crate::" + x.FullPath.Replace("/", "::")).ToList();
-                var allmods = modDic.Keys.Select(x => x.Replace(".", "::"));
+                var allmods = modDic.Values.Where(x => !x.FullPath.Contains('/')).Select(x => x.Name);
                 return CreateOutputFile($"{GenerationContext.Current.TopModule}/src/lib.rs", GenerateLib(ctx, allmods, allns, topMod, polymorphicBeans));
             }),
             Task.Run(() => CreateOutputFile($"{GenerationContext.Current.TopModule}/Cargo.toml", GenerateToml(ctx))),
@@ -106,18 +106,17 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
             var parent = topMod;
             foreach (var se in ns)
             {
-                if (!modDic.TryGetValue(se, out mod!))
+                var modName = ToRustModuleName(se);
+                var fullPath = string.IsNullOrEmpty(parent.FullPath) ? modName : $"{parent.FullPath}/{modName}";
+                if (!modDic.TryGetValue(fullPath, out mod!))
                 {
                     mod = new Mod
                     {
-                        Name = se
+                        Name = modName,
+                        FullPath = fullPath,
                     };
 
-                    mod.FullPath = string.IsNullOrEmpty(parent.FullPath)
-                        ? mod.Name
-                        : $"{parent.FullPath}/{mod.Name}";
-
-                    modDic.Add(se, mod);
+                    modDic.Add(fullPath, mod);
                 }
 
                 parent.SubMods.Add(mod);
@@ -137,6 +136,11 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
                 mod.Enums.Add(def);
                 break;
         }
+    }
+
+    private static string ToRustModuleName(string name)
+    {
+        return name.ToLowerInvariant();
     }
 
     protected virtual string GenerateToml(GenerationContext ctx)

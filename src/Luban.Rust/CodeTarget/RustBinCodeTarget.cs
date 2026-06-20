@@ -1,9 +1,8 @@
 using Luban.CodeTarget;
-using Luban.CSharp.TemplateExtensions;
-using Luban.Rust.CodeTarget;
+using Luban.Rust.TemplateExtensions;
 using Scriban;
 
-namespace Luban.CSharp.CodeTarget;
+namespace Luban.Rust.CodeTarget;
 
 [CodeTarget("rust-bin")]
 public class RustBinCodeTarget : RustCodeTargetBase

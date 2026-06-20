@@ -11,29 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Templates\rust-json\toml.sbn">
+        <None Update="Templates\**\*.sbn">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\rust-json\lib.sbn">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\rust-json\mod.sbn">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\common\rs\macros\Cargo.toml.sbn">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\common\rs\macros\src\lib.rs.sbn">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\rust-bin\lib.sbn">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\rust-bin\mod.sbn">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </None>
-        <None Update="Templates\rust-bin\toml.sbn">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

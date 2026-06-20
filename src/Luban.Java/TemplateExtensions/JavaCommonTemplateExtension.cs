@@ -18,6 +18,16 @@ public class JavaCommonTemplateExtension : ScriptObject
         return type.Apply(JavaDeclaringBoxTypeNameVisitor.Ins);
     }
 
+    public static string DeclaringDefTypeName(TType type)
+    {
+        return type.Apply(JavaDefDeclaringTypeNameVisitor.Ins);
+    }
+
+    public static string DeclaringDefBoxTypeName(TType type)
+    {
+        return type.Apply(JavaDefDeclaringBoxTypeNameVisitor.Ins);
+    }
+
     public static string ClassModifier(DefBean type)
     {
         return type.IsAbstractType ? "abstract" : "final";
