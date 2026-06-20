@@ -65,7 +65,7 @@ public class GameFrameXTableImporter : ITableImporter
             }
 
             string rawTableFullName = match.Groups[1].Value;
-            var split = rawTableFullName.Split(['-', '_',], StringSplitOptions.RemoveEmptyEntries);
+            var split = rawTableFullName.Split(new[] { '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
             if (split.Length > 1)
             {
                 // 代表有首字母的排序, 不管后面有多少都只要第二个切片

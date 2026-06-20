@@ -94,7 +94,7 @@ public class GlobalConfigLoader : IConfigLoader
             {
                 DirectoryInfo directoryInfo = new DirectoryInfo(fileOrDirectory);
 
-                string[] extensions = [".xlsx", ".csv", ".xls", ".xlsm",];
+                string[] extensions = { ".xlsx", ".csv", ".xls", ".xlsm", };
 
                 foreach (var extensionName in extensions)
                 {

@@ -20,8 +20,8 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
 
     protected override ICodeStyle DefaultCodeStyle => CodeFormatManager.Ins.PythonDefaultCodeStyle;
 
-    private static readonly HashSet<string> _preservedKeyWords =
-    [
+    private static readonly HashSet<string> _preservedKeyWords = new()
+    {
         "as", "async", "await", "break", "const", "continue", "crate",
         "dyn", "else", "enum", "extern", "false", "fn", "for", "if",
         "impl", "in", "let", "loop", "match", "mod", "move", "mut",
@@ -31,7 +31,7 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
         // Keywords Reserved for Future Use
         "abstract", "become", "box", "do", "final", "macro", "override",
         "priv", "try", "typeof", "unsized", "virtual", "yield"
-    ];
+    };
 
     protected override void OnCreateTemplateContext(TemplateContext ctx)
     {
@@ -220,9 +220,9 @@ public class RustCodeTargetBase : TemplateCodeTargetBase
     {
         public string Name { get; set; } = string.Empty;
         public string FullPath { get; set; } = string.Empty;
-        public HashSet<Mod> SubMods { get; set; } = [];
-        public List<DefTable> Tables { get; set; } = [];
-        public List<DefBean> Beans { get; set; } = [];
-        public List<DefEnum> Enums { get; set; } = [];
+        public HashSet<Mod> SubMods { get; set; } = new();
+        public List<DefTable> Tables { get; set; } = new();
+        public List<DefBean> Beans { get; set; } = new();
+        public List<DefEnum> Enums { get; set; } = new();
     }
 }
