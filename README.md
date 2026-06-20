@@ -131,6 +131,32 @@ C-Achievement-s-成就表-AAA-BBB.xlsx => `Tb`Achievement, 当前导出目标为
 
 C-Achievement-c-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement, 当前导出目标为 `c` 时才会导出
 
+## Docker
+
+Luban 提供 Docker 镜像，版本 tag 与 Git tag 保持一致，使用无 `v` 前缀的 SemVer 格式，例如 `3.12.0`。
+
+镜像地址：
+
+| Registry | Image |
+|:---------|:------|
+| Docker Hub | `docker.io/gameframex/gameframex-luban:<version>` |
+| GitHub Container Registry | `ghcr.io/gameframex/gameframex-luban:<version>` |
+| Aliyun Container Registry | `<ALIYUN_REGISTRY_URL>/<ALIYUN_NAMESPACE>/gameframex-luban:<version>` |
+
+示例：
+
+```bash
+docker run --rm docker.io/gameframex/gameframex-luban:3.12.0 --help
+```
+
+在当前项目目录中运行 Luban 时，可以挂载工作目录：
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work docker.io/gameframex/gameframex-luban:3.12.0 --help
+```
+
+发布镜像只提供精确版本 tag，不提供 `latest`、`3`、`3.12` 等浮动 tag。
+
 ## 文档
 
 - [官方文档](https://luban.doc.code-philosophy.com/)
