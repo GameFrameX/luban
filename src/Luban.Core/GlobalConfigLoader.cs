@@ -90,42 +90,45 @@ public class GlobalConfigLoader : IConfigLoader
                 importFiles.Add(new SchemaFileInfo() { FileName = subFile, Type = schemaFile.Type });
             }
 
-            DirectoryInfo directoryInfo = new DirectoryInfo(fileOrDirectory);
-
-            string[] extensions = [".xlsx", ".csv", ".xls", ".xlsm",];
-
-            foreach (var extensionName in extensions)
+            if (Directory.Exists(fileOrDirectory))
             {
-                var fileInfos = directoryInfo.GetFiles($"*{extensionName}", SearchOption.AllDirectories);
-                foreach (var fileInfo in fileInfos)
+                DirectoryInfo directoryInfo = new DirectoryInfo(fileOrDirectory);
+
+                string[] extensions = [".xlsx", ".csv", ".xls", ".xlsm",];
+
+                foreach (var extensionName in extensions)
                 {
-                    var typeList = fileInfo.Name.Split("__", StringSplitOptions.RemoveEmptyEntries);
-                    if (typeList.Length <= 1)
+                    var fileInfos = directoryInfo.GetFiles($"*{extensionName}", SearchOption.AllDirectories);
+                    foreach (var fileInfo in fileInfos)
                     {
-                        continue;
-                    }
+                        var typeList = fileInfo.Name.Split("__", StringSplitOptions.RemoveEmptyEntries);
+                        if (typeList.Length <= 1)
+                        {
+                            continue;
+                        }
 
-                    var type = typeList[0];
-                    var newType = string.Empty;
-                    if (type.StartsWith("table"))
-                    {
-                        newType = "table";
-                    }
-                    else if (type.StartsWith("bean"))
-                    {
-                        newType = "bean";
-                    }
-                    else if (type.StartsWith("enum"))
-                    {
-                        newType = "enum";
-                    }
+                        var type = typeList[0];
+                        var newType = string.Empty;
+                        if (type.StartsWith("table"))
+                        {
+                            newType = "table";
+                        }
+                        else if (type.StartsWith("bean"))
+                        {
+                            newType = "bean";
+                        }
+                        else if (type.StartsWith("enum"))
+                        {
+                            newType = "enum";
+                        }
 
-                    if (string.IsNullOrEmpty(newType))
-                    {
-                        continue;
-                    }
+                        if (string.IsNullOrEmpty(newType))
+                        {
+                            continue;
+                        }
 
-                    importFiles.Add(new SchemaFileInfo() { FileName = fileInfo.FullName, Type = newType, });
+                        importFiles.Add(new SchemaFileInfo() { FileName = fileInfo.FullName, Type = newType, });
+                    }
                 }
             }
         }
