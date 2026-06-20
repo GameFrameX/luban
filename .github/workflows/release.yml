@@ -1,0 +1,275 @@
+name: Publish Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  IMAGE_NAME: gameframex-luban
+  VERSION_PROPS_PATH: src/Version.props
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read project version
+        id: current_version
+        run: |
+          VERSION="$(dotnet msbuild src/Luban/Luban.csproj -getProperty:Version)"
+          if [ -z "$VERSION" ]; then
+            echo "Version is empty"
+            exit 1
+          fi
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version '$VERSION' is not a no-v SemVer release version"
+            exit 1
+          fi
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Plan release version
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          current="${{ steps.current_version.outputs.value }}"
+
+          latest_tag="$(git tag --list | sed -nE 's/^v?([0-9]+\.[0-9]+\.[0-9]+)$/\1 &/p' | sort -V -k1,1 | tail -n 1 | awk '{print $2}')"
+          current_tag_exists=false
+          if git rev-parse -q --verify "refs/tags/$current" >/dev/null; then
+            current_tag_exists=true
+          fi
+
+          if [ "$current_tag_exists" = "false" ]; then
+            echo "need_release=true" >> "$GITHUB_OUTPUT"
+            echo "version=$current" >> "$GITHUB_OUTPUT"
+            echo "base_tag=${latest_tag}" >> "$GITHUB_OUTPUT"
+            echo "reason=Current Version.props has not been released" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          range="$current..HEAD"
+          major=false
+          minor=false
+          patch=false
+          breaking_re='^[a-zA-Z]+(\([^)]+\))?!:'
+          feat_re='^feat(\([^)]+\))?:'
+          patch_re='^(fix|perf|refactor)(\([^)]+\))?:'
+
+          while IFS= read -r -d '' commit; do
+            subject="${commit%%$'\x1f'*}"
+            body="${commit#*$'\x1f'}"
+
+            if [[ "$subject" =~ ^chore\(release\): ]]; then
+              continue
+            fi
+
+            if [[ "$subject" =~ $breaking_re ]] || grep -q "BREAKING CHANGE:" <<< "$body"; then
+              major=true
+            elif [[ "$subject" =~ $feat_re ]]; then
+              minor=true
+            elif [[ "$subject" =~ $patch_re ]]; then
+              patch=true
+            fi
+          done < <(git log --format='%s%x1f%b%x00' "$range")
+
+          if [ "$major" = "false" ] && [ "$minor" = "false" ] && [ "$patch" = "false" ]; then
+            echo "need_release=false" >> "$GITHUB_OUTPUT"
+            echo "version=$current" >> "$GITHUB_OUTPUT"
+            echo "base_tag=$current" >> "$GITHUB_OUTPUT"
+            echo "reason=No releasable commits" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          IFS=. read -r major_version minor_version patch_version <<< "$current"
+          if [ "$major" = "true" ]; then
+            major_version=$((major_version + 1))
+            minor_version=0
+            patch_version=0
+          elif [ "$minor" = "true" ]; then
+            minor_version=$((minor_version + 1))
+            patch_version=0
+          else
+            patch_version=$((patch_version + 1))
+          fi
+
+          next_version="$major_version.$minor_version.$patch_version"
+          echo "need_release=true" >> "$GITHUB_OUTPUT"
+          echo "version=$next_version" >> "$GITHUB_OUTPUT"
+          echo "base_tag=$current" >> "$GITHUB_OUTPUT"
+          echo "reason=Releasable commits found" >> "$GITHUB_OUTPUT"
+
+      - name: Show release decision
+        run: |
+          echo "Need release: ${{ steps.release.outputs.need_release }}"
+          echo "Version: ${{ steps.release.outputs.version }}"
+          echo "Base tag: ${{ steps.release.outputs.base_tag }}"
+          echo "Reason: ${{ steps.release.outputs.reason }}"
+
+      - name: Update Version.props
+        if: steps.release.outputs.need_release == 'true'
+        run: |
+          sed -i 's|<Version>[^<]*</Version>|<Version>${{ steps.release.outputs.version }}</Version>|' "$VERSION_PROPS_PATH"
+
+      - name: Download shared cliff config
+        if: steps.release.outputs.need_release == 'true'
+        run: curl -L https://raw.githubusercontent.com/GameFrameX/public-github-actions/main/cliff.toml -o cliff.toml
+
+      - name: Generate CHANGELOG
+        if: steps.release.outputs.need_release == 'true'
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --tag ${{ steps.release.outputs.version }} --strip header
+        env:
+          OUTPUT: CHANGELOG.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Generate release notes
+        if: steps.release.outputs.need_release == 'true'
+        id: release_notes
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: --tag ${{ steps.release.outputs.version }} --latest --strip header
+        env:
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Build
+        if: steps.release.outputs.need_release == 'true'
+        run: dotnet build src/Luban.sln --configuration Release
+
+      - name: Normalize image owner
+        if: steps.release.outputs.need_release == 'true'
+        id: image
+        run: |
+          OWNER="$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')"
+          echo "ghcr=ghcr.io/$OWNER/$IMAGE_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Validate registry settings
+        if: steps.release.outputs.need_release == 'true'
+        run: |
+          if [ -z "${{ secrets.DOCKERHUB_ORGANIZATION }}" ]; then
+            echo "DOCKERHUB_ORGANIZATION is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then
+            echo "DOCKERHUB_USERNAME is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then
+            echo "DOCKERHUB_TOKEN is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_URL }}" ]; then
+            echo "ALIYUN_REGISTRY_URL is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_NAMESPACE }}" ]; then
+            echo "ALIYUN_NAMESPACE is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_USERNAME }}" ]; then
+            echo "ALIYUN_REGISTRY_USERNAME is required"
+            exit 1
+          fi
+          if [ -z "${{ secrets.ALIYUN_REGISTRY_PASSWORD }}" ]; then
+            echo "ALIYUN_REGISTRY_PASSWORD is required"
+            exit 1
+          fi
+          if [[ "${{ secrets.ALIYUN_REGISTRY_URL }}" =~ ^https?:// ]]; then
+            echo "ALIYUN_REGISTRY_URL should not include a URL scheme"
+            exit 1
+          fi
+
+      - name: Log in to Docker Hub
+        if: steps.release.outputs.need_release == 'true'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Log in to GitHub Container Registry
+        if: steps.release.outputs.need_release == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Aliyun Registry
+        if: steps.release.outputs.need_release == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ secrets.ALIYUN_REGISTRY_URL }}
+          username: ${{ secrets.ALIYUN_REGISTRY_USERNAME }}
+          password: ${{ secrets.ALIYUN_REGISTRY_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        if: steps.release.outputs.need_release == 'true'
+        uses: docker/setup-buildx-action@v4
+
+      - name: Docker metadata
+        if: steps.release.outputs.need_release == 'true'
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            docker.io/${{ secrets.DOCKERHUB_ORGANIZATION }}/${{ env.IMAGE_NAME }}
+            ${{ steps.image.outputs.ghcr }}
+            ${{ secrets.ALIYUN_REGISTRY_URL }}/${{ secrets.ALIYUN_NAMESPACE }}/${{ env.IMAGE_NAME }}
+          flavor: |
+            latest=false
+          tags: |
+            type=raw,value=${{ steps.release.outputs.version }}
+
+      - name: Build and push Docker image
+        if: steps.release.outputs.need_release == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: ./src
+          file: ./src/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Commit release changes
+        if: steps.release.outputs.need_release == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md "$VERSION_PROPS_PATH"
+          git commit -m "chore(release): ${{ steps.release.outputs.version }}"
+
+      - name: Push changes and tag
+        if: steps.release.outputs.need_release == 'true'
+        run: |
+          git push origin "${{ github.ref_name }}"
+          git tag "${{ steps.release.outputs.version }}"
+          git push origin "${{ steps.release.outputs.version }}"
+
+      - name: Create GitHub Release
+        if: steps.release.outputs.need_release == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.version }}
+          body: ${{ steps.release_notes.outputs.changelog }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
