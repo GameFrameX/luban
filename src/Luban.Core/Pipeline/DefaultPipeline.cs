@@ -1,4 +1,5 @@
 using Luban.CodeTarget;
+using Luban.DataLoader;
 using Luban.DataTarget;
 using Luban.Defs;
 using Luban.L10N;
@@ -6,6 +7,8 @@ using Luban.OutputSaver;
 using Luban.PostProcess;
 using Luban.RawDefs;
 using Luban.Schema;
+using Luban.TypeVisitors;
+using Luban.Utils;
 using Luban.Validator;
 using NLog;
 
@@ -54,6 +57,8 @@ public class DefaultPipeline : IPipeline
         _genCtx = new GenerationContext();
         _defAssembly = new DefAssembly(_rawAssembly, _args.Target, _args.OutputTables, _config.Groups, _args.Variants);
 
+        CollectAutoExtendEnums();
+
         var generationCtxBuilder = new GenerationContextBuilder
         {
             Assembly = _defAssembly,
@@ -62,6 +67,75 @@ public class DefaultPipeline : IPipeline
             TimeZone = _args.TimeZone,
         };
         _genCtx.Init(generationCtxBuilder);
+    }
+
+    // 对 autoExtend 枚举进行预扫描：在类型编译完成之后、代码生成与正式数据加载之前，
+    // 加载引用了这些枚举的表数据，把未定义的值收集起来并固化为正式枚举项。
+    // 这样生成的枚举代码会包含全部（预定义 + 自动收集）的枚举项。
+    private void CollectAutoExtendEnums()
+    {
+        var autoExtendEnums = _defAssembly.TypeList.OfType<DefEnum>().Where(e => e.AutoExtend).ToList();
+        if (autoExtendEnums.Count == 0)
+        {
+            return;
+        }
+
+        s_logger.Info("auto-extend enum collect begin: {}", string.Join(",", autoExtendEnums.Select(e => e.FullName)));
+
+        var referencingTables = new List<DefTable>();
+        foreach (var table in _defAssembly.GetAllTables())
+        {
+            var refTypes = new Dictionary<string, DefTypeBase>();
+            table.ValueTType.Apply(RefTypeVisitor.Ins, refTypes);
+            if (refTypes.Values.OfType<DefEnum>().Any(e => e.AutoExtend))
+            {
+                referencingTables.Add(table);
+            }
+        }
+
+        foreach (var e in autoExtendEnums)
+        {
+            e.BeginAutoExtendCollect();
+        }
+
+        try
+        {
+            foreach (var table in referencingTables)
+            {
+                CollectTableForAutoExtend(table);
+            }
+        }
+        finally
+        {
+            foreach (var e in autoExtendEnums)
+            {
+                e.EndAutoExtendCollectAndApply();
+            }
+        }
+
+        s_logger.Info("auto-extend enum collect end");
+    }
+
+    private void CollectTableForAutoExtend(DefTable table)
+    {
+        string inputDataDir = GenerationContext.GetInputDataPath();
+        var options = new Dictionary<string, string>();
+        foreach (var inputFile in table.InputFiles)
+        {
+            var (actualFile, subAssetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(inputFile));
+            foreach (var atomFile in FileUtil.GetFileOrDirectory(inputDataDir, Path.Combine(inputDataDir, actualFile)))
+            {
+                try
+                {
+                    // 仅利用加载过程中的副作用（DEnum 构造会记录未定义值），记录本身丢弃。
+                    DataLoaderManager.Ins.LoadTableFile(table, atomFile, subAssetName, options);
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"auto-extend collect 加载失败. table:{table.FullName} file:{atomFile}", e);
+                }
+            }
+        }
     }
 
     protected void LoadDatas()

@@ -148,7 +148,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             }
             if (CheckDefault(x))
             {
-                if (type.DefEnum.IsFlags || type.DefEnum.HasZeroValueItem)
+                if (type.DefEnum.IsFlags || type.DefEnum.HasZeroValueItem || type.DefEnum.AutoExtend)
                 {
                     return new DEnum(type, "0");
                 }
@@ -174,7 +174,14 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                 string itemName = field.SelfTitle.Name;
                 if (!type.DefEnum.TryValueByNameOrAlias(itemName, out _))
                 {
-                    throw new Exception($"列名:{itemName} 不是枚举类型'{type.DefEnum.FullName}'的有效枚举项");
+                    if (type.DefEnum.IsAutoExtendCollecting)
+                    {
+                        type.DefEnum.RecordAutoExtendPending(itemName);
+                    }
+                    else
+                    {
+                        throw new Exception($"列名:{itemName} 不是枚举类型'{type.DefEnum.FullName}'的有效枚举项");
+                    }
                 }
                 if (field.IsBlank)
                 {
@@ -193,7 +200,7 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
                     return null;
                 }
 
-                if (type.DefEnum.IsFlags || type.DefEnum.HasZeroValueItem)
+                if (type.DefEnum.IsFlags || type.DefEnum.HasZeroValueItem || type.DefEnum.AutoExtend)
                 {
                     return new DEnum(type, "0");
                 }
