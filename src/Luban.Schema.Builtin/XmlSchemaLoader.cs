@@ -68,7 +68,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         }
     }
 
-    private static readonly List<string> _enumOptionalAttrs = new() { "flags", "comment", "tags", "unique", "group" };
+    private static readonly List<string> _enumOptionalAttrs = new() { "flags", "comment", "tags", "unique", "group", "auto_extend" };
     private static readonly List<string> _enumRequiredAttrs = new() { "name" };
 
     private static readonly List<string> _enumItemOptionalAttrs = new() { "value", "alias", "comment", "tags" };
@@ -85,6 +85,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
             IsFlags = XmlUtil.GetOptionBoolAttribute(e, "flags"),
             Tags = DefUtil.ParseAttrs(XmlUtil.GetOptionalAttribute(e, "tags")),
             IsUniqueItemId = XmlUtil.GetOptionBoolAttribute(e, "unique", true),
+            AutoExtend = XmlUtil.GetOptionBoolAttribute(e, "auto_extend"),
             Groups = SchemaLoaderUtil.CreateGroups(XmlUtil.GetOptionalAttribute(e, "group")),
             Items = new(),
             TypeMappers = new(),

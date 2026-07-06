@@ -180,14 +180,25 @@ public class ExcelSchemaLoader : SchemaLoaderBase
 
             DList items = (data.GetField("items") as DList);
 
+            // auto_extend 复用已有的 tags 列配置（在 tags 中写 auto_extend 或 auto_extend=1 即启用），
+            // 避免给 __enums__ 强加新列而破坏既有 excel 文件。
+            var tags = DefUtil.ParseAttrs((data.GetField("tags") as DString).Value);
+            bool autoExtend = tags.TryGetValue("auto_extend", out var autoExtendVal) && autoExtendVal != "false" && autoExtendVal != "0";
+            // auto_extend 是构建期指令，不应作为普通 tag 流入生成代码，读取后从 tags 中移除。
+            if (autoExtend)
+            {
+                tags.Remove("auto_extend");
+            }
+
             var curEnum = new RawEnum()
             {
                 Name = name,
                 Namespace = module,
                 IsFlags = (data.GetField("flags") as DBool).Value,
-                Tags = DefUtil.ParseAttrs((data.GetField("tags") as DString).Value),
+                Tags = tags,
                 Comment = (data.GetField("comment") as DString).Value,
                 IsUniqueItemId = (data.GetField("unique") as DBool).Value,
+                AutoExtend = autoExtend,
                 Groups = SchemaLoaderUtil.CreateGroups((data.GetField("group") as DString).Value.Trim()),
                 Items = items.Datas.Cast<DBean>().Select(d => new EnumItem()
                 {

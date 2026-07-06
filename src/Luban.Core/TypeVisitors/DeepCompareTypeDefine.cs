@@ -178,6 +178,7 @@ class DeepCompareTypeDefine : ITypeFuncVisitor<TType, Dictionary<DefTypeBase, bo
         var same = a.FullName == b.FullName
                    && a.IsFlags == b.IsFlags
                    && a.IsUniqueItemId == b.IsUniqueItemId
+                   && a.AutoExtend == b.AutoExtend
                    && IsEnumItemEquals(a.Items, b.Items);
         y.Add(a, same);
         return same;

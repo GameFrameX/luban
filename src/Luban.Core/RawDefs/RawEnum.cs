@@ -25,6 +25,10 @@ public class RawEnum
 
     public bool IsUniqueItemId { get; set; }
 
+    // 当为 true 时，构建时会自动扫描引用该枚举的表数据，
+    // 把未在定义中声明的值收集起来作为枚举子项。
+    public bool AutoExtend { get; set; }
+
     public string Comment { get; set; }
 
     public Dictionary<string, string> Tags { get; set; }
