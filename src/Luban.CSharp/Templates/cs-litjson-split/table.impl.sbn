@@ -30,9 +30,9 @@ using GameFrameX.LitJSON.Runtime;
 {{namespace_with_grace_begin __namespace_with_top_module}}
     public partial class {{__name}} : BaseDataTable<{{declaring_type_name __value_type}}>
     {
+        {{~if __table.is_map_table ~}}
         private readonly System.Func<System.Threading.Tasks.Task<JsonData>> _loadFunc;
         public {{__name}}(System.Func<System.Threading.Tasks.Task<JsonData>> loadFunc)
-        {{~if __table.is_map_table ~}}
         {
             _loadFunc = loadFunc;
         }
@@ -78,6 +78,8 @@ using GameFrameX.LitJSON.Runtime;
         private System.Collections.Generic.Dictionary<{{declaring_type_name idx.type}}, {{declaring_type_name __value_type}}> _dataMap_{{idx.index_field.name}};
         {{~end~}}
         {{~end~}}
+
+        private readonly System.Func<System.Threading.Tasks.Task<JsonData>> _loadFunc;
 
         public {{__name}}(System.Func<System.Threading.Tasks.Task<JsonData>> loadFunc)
         {
@@ -149,6 +151,7 @@ using GameFrameX.LitJSON.Runtime;
 
         private {{declaring_type_name __value_type}} _data;
         public {{declaring_type_name __value_type}} Data => _data;
+        private readonly System.Func<System.Threading.Tasks.Task<JsonData>> _loadFunc;
 
         public {{__name}}(System.Func<System.Threading.Tasks.Task<JsonData>> loadFunc)
         {
