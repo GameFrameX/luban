@@ -1,3 +1,12 @@
+## [3.13.1] - 2026-07-07
+
+### Bug Fixes
+
+* 修复 table 模板 list/one 模式生成重复字段与构造函数
+
+### Features
+
+* 新增 cs-litjson / cs-litjson-split 代码生成目标
 ## [3.13.0] - 2026-07-07
 
 ### Features
