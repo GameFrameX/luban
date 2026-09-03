@@ -39,9 +39,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NLog" Version="5.3.4" />
-      <PackageReference Include="Scriban" Version="6.2.1" />
-      <PackageReference Include="ExcelDataReader" Version="3.7.0" />
+      <PackageReference Include="NLog" Version="6.2.0" />
+      <PackageReference Include="Scriban" Version="7.2.7" />
+      <PackageReference Include="ExcelDataReader" Version="3.9.0" />
     </ItemGroup>
 
 </Project>
