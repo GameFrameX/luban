@@ -47,6 +47,15 @@ public class GameFrameXTextProvider : ITextProvider
 
     public bool ConvertTextKeyToValue => _convertTextKeyToValue;
 
+    /// <summary>
+    /// 合并当前批次的内联文本；已加载的外部本地化值保持优先。
+    /// </summary>
+    /// <param name="entries">业务配置表中收集到的内联映射。</param>
+    public void AddInlineTexts(IReadOnlyList<InlineTextEntry> entries)
+    {
+        InlineTextMerger.Merge(_texts, entries, s_logger);
+    }
+
     public bool IsValidKey(string key)
     {
         return _texts.ContainsKey(key);

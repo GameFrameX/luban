@@ -63,6 +63,11 @@ public class GenerationContext
 
     public ITextProvider TextProvider { get; private set; }
 
+    /// <summary>
+    /// 当前导表批次从业务表收集到的内联本地化映射。
+    /// </summary>
+    public InlineTextCollection InlineTexts { get; private set; }
+
     private readonly Dictionary<string, object> _uniqueObjects = new();
 
     private readonly HashSet<Type> _failedValidatorTypes = new();
@@ -74,6 +79,16 @@ public class GenerationContext
         s_logger.Info("load datas begin");
         TextProvider?.Load();
         DataLoaderManager.Ins.LoadDatas(this);
+        if (InlineTextGenerator.Enabled)
+        {
+            InlineTexts = InlineTextCollector.Collect(this);
+            InlineTextGenerator.Generate(InlineTexts);
+            TextProvider?.AddInlineTexts(InlineTexts.Entries);
+        }
+        else
+        {
+            InlineTexts = new InlineTextCollection();
+        }
         s_logger.Info("load datas end");
     }
 

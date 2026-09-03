@@ -143,11 +143,63 @@ public static class SheetLoadUtil
 
         rootTitle.Init();
 
+        MarkInlineTextValueColumns(rootTitle, cells);
+
         if (rootTitle.SubTitleList.Count == 0)
         {
             throw new Exception($"没有定义任何有效 列");
         }
         return rootTitle;
+    }
+
+    private static void MarkInlineTextValueColumns(Title title, List<List<Cell>> cells)
+    {
+        foreach (var subTitle in title.SubTitleList)
+        {
+            MarkInlineTextValueColumns(subTitle, cells);
+        }
+
+        if (title.Root || title.HasSubTitle || title.SelfMultiRows || title.HierarchyMultiRows)
+        {
+            return;
+        }
+
+        List<Cell> typeRow = cells.FirstOrDefault(IsTypeRow);
+        if (typeRow == null || title.FromIndex >= typeRow.Count)
+        {
+            return;
+        }
+
+        string type = typeRow[title.FromIndex].Value?.ToString()?.Trim() ?? "";
+        if (!IsScalarTextType(type))
+        {
+            return;
+        }
+
+        int valueIndex = title.FromIndex + 1;
+        List<Cell> titleRow = title.HeaderRowIndex >= 0 && title.HeaderRowIndex < cells.Count ? cells[title.HeaderRowIndex] : null;
+        if (titleRow == null || valueIndex >= titleRow.Count || valueIndex >= typeRow.Count)
+        {
+            return;
+        }
+
+        bool titleEmpty = string.IsNullOrWhiteSpace(titleRow[valueIndex].Value?.ToString());
+        bool typeEmpty = string.IsNullOrWhiteSpace(typeRow[valueIndex].Value?.ToString());
+        if (titleEmpty && typeEmpty)
+        {
+            title.InlineValueIndex = valueIndex;
+            title.ToIndex = valueIndex;
+        }
+    }
+
+    private static bool IsScalarTextType(string type)
+    {
+        type = type.Split('&', 2)[0].Trim();
+        while (type.EndsWith('?') || type.EndsWith('!'))
+        {
+            type = type[..^1];
+        }
+        return string.Equals(type, "text", StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool TryFindTopTitle(List<List<Cell>> cells, out int rowIndex)
@@ -277,7 +329,7 @@ public static class SheetLoadUtil
                             continue;
                         }
                         var (titleName, tags) = ParseNameAndMetaAttrs(nameAndAttrs);
-                        subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = mergeCell.FromColumn, ToIndex = mergeCell.ToColumn };
+                        subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = mergeCell.FromColumn, ToIndex = mergeCell.ToColumn, HeaderRowIndex = rowIndex };
                         //s_logger.Info("=== sheet:{sheet} title:{title}", Name, newTitle);
                     }
                 }
@@ -292,7 +344,7 @@ public static class SheetLoadUtil
                             continue;
                         }
                         var (titleName, tags) = ParseNameAndMetaAttrs(nameAndAttrs);
-                        subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = mergeCell.FromRow, ToIndex = mergeCell.ToRow };
+                        subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = mergeCell.FromRow, ToIndex = mergeCell.ToRow, HeaderRowIndex = rowIndex };
                     }
                 }
                 if (subTitle == null)
@@ -345,7 +397,7 @@ public static class SheetLoadUtil
                 {
                     throw new Exception($"列:'[{titleName}' 未找到结束匹配列 '{titleName}]'");
                 }
-                subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = startIndex, ToIndex = i };
+                subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = startIndex, ToIndex = i, HeaderRowIndex = rowIndex };
             }
             else
             {
@@ -360,7 +412,7 @@ public static class SheetLoadUtil
                         continue;
                     }
                 }
-                subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = i, ToIndex = i };
+                subTitle = new Title() { Name = titleName, Tags = tags, FromIndex = i, ToIndex = i, HeaderRowIndex = rowIndex };
             }
             if (excelRowIndex < cells.Count && TryFindNextSubFieldRowIndex(cells, excelRowIndex, out int nextRowIndex))
             {

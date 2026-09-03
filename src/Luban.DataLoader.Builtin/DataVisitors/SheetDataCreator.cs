@@ -249,7 +249,8 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             }
             throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
         }
-        return DString.ValueOf(type, s);
+        string inlineValue = type.HasTag("text") ? (row.SelfTitle.InlineValueIndex.HasValue ? ParseString(row.InlineValue, false) : s) : null;
+        return DString.ValueOf(type, s, inlineValue);
     }
 
     public DType Accept(TDateTime type, RowColumnSheet sheet, TitleRow row)

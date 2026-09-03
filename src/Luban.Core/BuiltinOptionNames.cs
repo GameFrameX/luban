@@ -42,6 +42,14 @@ public static class BuiltinOptionNames
 
     public const string L10NTextListFile = "textListFile";
 
+    public const string L10NInlineEnabled = "inline.enabled";
+
+    public const string L10NInlineLanguageFieldName = "inline.languageFieldName";
+
+    public const string L10NInlineOutputPath = "inline.outputPath";
+
+    public const string L10NInlineOutputFileNameFormat = "inline.outputFileNameFormat";
+
     public const string TypeMapperType = "type";
 
     public const string TypeMapperConstructor = "constructor";

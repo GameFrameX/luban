@@ -10,6 +10,14 @@ public class Title
 
     public int ToIndex { get; set; }
 
+    /// <summary>
+    /// 标量 text 的内联 value 列索引；null 表示没有内联 value 列。
+    /// 该字段只描述 Excel 输入布局，不改变运行时字段数量。
+    /// </summary>
+    public int? InlineValueIndex { get; set; }
+
+    internal int HeaderRowIndex { get; set; } = -1;
+
     public string Name { get; set; }
 
     public Dictionary<string, string> Tags { get; set; }

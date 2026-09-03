@@ -29,6 +29,20 @@ class TitleRow
         }
     }
 
+    public object InlineValue
+    {
+        get
+        {
+            if (!SelfTitle.InlineValueIndex.HasValue || Row == null)
+            {
+                return null;
+            }
+
+            int index = SelfTitle.InlineValueIndex.Value;
+            return index < Row.Count ? Row[index].Value : null;
+        }
+    }
+
     public List<Cell> Row { get; }
 
     public int CellCount => SelfTitle.ToIndex - SelfTitle.FromIndex + 1;

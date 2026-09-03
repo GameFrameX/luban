@@ -7,9 +7,20 @@ public class DString : DType<string>
 {
     private static readonly DString s_empty = new("");
 
+    /// <summary>
+    /// 内联本地化值。null 表示该字符串不是由配置表 text 的内联布局产生。
+    /// 运行时字符串和所有已有序列化仍使用 <see cref="DType{T}.Value"/>。
+    /// </summary>
+    public string InlineValue { get; }
+
     public static DString ValueOf(TType type, string s)
     {
-        if (s.Length == 0)
+        return ValueOf(type, s, null);
+    }
+
+    public static DString ValueOf(TType type, string s, string inlineValue)
+    {
+        if (s.Length == 0 && inlineValue == null)
         {
             return s_empty;
         }
@@ -19,10 +30,10 @@ public class DString : DType<string>
         {
             case "0":
             case "false":
-                return new DString(s);
+                return new DString(s, inlineValue);
             case "1":
             case "true":
-                return new DString(System.Text.RegularExpressions.Regex.Unescape(s));
+                return new DString(System.Text.RegularExpressions.Regex.Unescape(s), inlineValue);
             default:
                 throw new Exception($"unknown escape mode:{escapeMode}");
         }
@@ -30,8 +41,9 @@ public class DString : DType<string>
 
     public override string TypeName => "string";
 
-    private DString(string x) : base(x)
+    private DString(string x, string inlineValue = null) : base(x)
     {
+        InlineValue = inlineValue;
     }
 
     public override void Apply<T>(IDataActionVisitor<T> visitor, T x)
