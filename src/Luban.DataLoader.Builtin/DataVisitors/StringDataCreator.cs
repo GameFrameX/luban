@@ -46,7 +46,16 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
 
     public DType Accept(TInt type, string x)
     {
-        if (int.TryParse(x, out var b))
+        int b;
+        if (x.StartsWith("0x") || x.StartsWith("0X"))
+        {
+            if (!int.TryParse(x.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out b))
+            {
+                throw new Exception($"{x} 不是int类型");
+            }
+            return DInt.ValueOf(b);
+        }
+        if (int.TryParse(x, out b))
         {
             return DInt.ValueOf(b);
         }
