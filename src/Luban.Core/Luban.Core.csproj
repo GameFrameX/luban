@@ -41,6 +41,7 @@
     <ItemGroup>
       <PackageReference Include="NLog" Version="5.3.4" />
       <PackageReference Include="Scriban" Version="6.2.1" />
+      <PackageReference Include="ExcelDataReader" Version="3.7.0" />
     </ItemGroup>
 
 </Project>
