@@ -41,8 +41,8 @@ public class GameFrameXTextProvider : ITextProvider
             }
         }
 
-        string textProviderFile = env.GetOption(BuiltinOptionNames.L10NFamily, BuiltinOptionNames.L10NTextFilePath, false);
-        LoadTextListFromFile(textProviderFile);
+        var paths = env.GetOptionList(BuiltinOptionNames.L10NFamily, BuiltinOptionNames.L10NTextFilePath, false);
+        LoadTextListFromFile(paths);
     }
 
     public bool ConvertTextKeyToValue => _convertTextKeyToValue;
@@ -66,8 +66,13 @@ public class GameFrameXTextProvider : ITextProvider
         return _texts.TryGetValue(key, out text);
     }
 
-    private void LoadTextListFromFile(string path)
+    private void LoadTextListFromFile(IReadOnlyList<string> paths)
     {
+        if (paths == null || paths.Count == 0)
+        {
+            return;
+        }
+
         var ass = new DefAssembly(new RawAssembly() { Targets = new List<RawTarget> { new() { Name = "default", Manager = "Tables" } }, }, "default", new List<string>(), null,
                                   null);
 
@@ -94,49 +99,56 @@ public class GameFrameXTextProvider : ITextProvider
         defTableRecordType.PostCompile();
         var tableRecordType = TBean.Create(false, defTableRecordType, null);
 
-
-        DirectoryInfo directoryInfo = new DirectoryInfo(path);
-        if (!directoryInfo.Exists)
-        {
-            s_logger.Error($"path:{path} is not a directory. ignore it! return");
-            return;
-        }
-
         var excelExts = new HashSet<string> { "xlsx", "xls", "xlsm", "csv" };
 
-        var fileInfos = directoryInfo.GetFiles("*", SearchOption.AllDirectories);
-        foreach (var fileInfo in fileInfos)
+        foreach (var path in paths)
         {
-            if (FileUtil.IsIgnoreFile(path, fileInfo.Name))
+            if (string.IsNullOrWhiteSpace(path))
             {
                 continue;
             }
 
-            string fileName = Path.GetFileName(fileInfo.Name);
-            string ext = Path.GetExtension(fileName).TrimStart('.');
-            if (!excelExts.Contains(ext))
+            DirectoryInfo directoryInfo = new DirectoryInfo(path);
+            if (!directoryInfo.Exists)
             {
+                s_logger.Error($"path:{path} is not a directory. ignore it!");
                 continue;
             }
 
-            (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileInfo.FullName));
-            var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
-
-            foreach (var r in records)
+            var fileInfos = directoryInfo.GetFiles("*", SearchOption.TopDirectoryOnly);
+            foreach (var fileInfo in fileInfos)
             {
-                DBean data = r.Data;
-
-                string key = ((DString)data.GetField(_keyFieldName)).Value;
-                string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
-                if (string.IsNullOrEmpty(key))
+                if (FileUtil.IsIgnoreFile(path, fileInfo.Name))
                 {
-                    s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
                     continue;
                 }
 
-                if (!_texts.TryAdd(key, value))
+                string fileName = Path.GetFileName(fileInfo.Name);
+                string ext = Path.GetExtension(fileName).TrimStart('.');
+                if (!excelExts.Contains(ext))
                 {
-                    s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
+                    continue;
+                }
+
+                (var actualFile, var sheetName) = FileUtil.SplitFileAndSheetName(FileUtil.Standardize(fileInfo.FullName));
+                var records = DataLoaderManager.Ins.LoadTableFile(tableRecordType, actualFile, sheetName, new Dictionary<string, string>());
+
+                foreach (var r in records)
+                {
+                    DBean data = r.Data;
+
+                    string key = ((DString)data.GetField(_keyFieldName)).Value;
+                    string value = _convertTextKeyToValue ? ((DString)data.GetField(_ValueFieldName)).Value : key;
+                    if (string.IsNullOrEmpty(key))
+                    {
+                        s_logger.Error("textFile:{} key:{} is empty. ignore it!", fileName, key);
+                        continue;
+                    }
+
+                    if (!_texts.TryAdd(key, value))
+                    {
+                        s_logger.Error("textFile:{} key:{} is duplicated", fileName, key);
+                    }
                 }
             }
         }
