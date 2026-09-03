@@ -89,7 +89,12 @@ class SheetDataCreator : ITypeFuncVisitor<RowColumnSheet, TitleRow, DType>
             ThrowIfNonEmpty(row);
             return DInt.Default;
         }
-        return DInt.ValueOf(int.Parse(x.ToString()));
+        var s = x.ToString();
+        if (s.StartsWith("0x") || s.StartsWith("0X"))
+        {
+            return DInt.ValueOf(int.Parse(s.Substring(2), System.Globalization.NumberStyles.HexNumber, null));
+        }
+        return DInt.ValueOf(int.Parse(s));
     }
 
     public DType Accept(TLong type, RowColumnSheet sheet, TitleRow row)
