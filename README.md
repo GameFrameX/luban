@@ -98,6 +98,37 @@ BASE=/tmp/luban-split-code-targets-acceptance scripts/accept-split-code-targets.
 --xargs l10n.provider=gameframex --xargs l10n.textFile.keyFieldName=key  --xargs l10n.textFile.path=./Excels/Tables/Localization/
 ```
 
+### 支持 text 内联本地化
+
+普通标量 `text` 支持一列或两列写法，不需要增加特殊字段标记：
+
+```text
+字段名行：... | name |        | description |        | id
+类型行：  ... | text |        | text        |        | int
+数据行：  ... | key  | 中文值  | desc_key    | 描述值  | 1
+```
+
+只有当 `text` 后一列的字段名和类型同时为空时，才将其识别为 value 列；否则 `text` 只占一列。单列 `text` 的 value 等于 key。一个表中可以有多个 `text` 字段，但只支持普通标量，不支持 `list<text>`、数组、map 或多行 text 的内联 value。
+
+显式开启后，Luban 会在业务数据加载完成后按业务表完整名称生成独立的本地化 XLSX 文件；未配置 Provider 时只生成文件，不替换业务数据中的 key：
+
+```text
+--xargs l10n.inline.enabled=true
+--xargs l10n.inline.languageFieldName=zh_CN
+--xargs l10n.inline.outputPath=Localization/Generated
+--xargs l10n.inline.outputFileNameFormat=L-Localization-c-{table}.xlsx
+```
+
+`l10n.inline.outputPath` 用于指定自动生成的本地化 `.xlsx` 文件目录，支持相对路径和绝对路径。相对路径以 Luban 进程的当前工作目录为基准，例如：
+
+```text
+--xargs l10n.inline.outputPath=/Users/mac/Documents/UnityWorks/X/Config/Excels/Local/Generated
+```
+
+`l10n.inline.outputFileNameFormat` 用于指定自动生成的本地化 `.xlsx` 文件名模板，默认 `{table}.xlsx`。模板支持占位符 `{table}`（替换为业务表完整名，会做文件名安全清洗）。需要统一添加前缀或调整扩展名时直接配置该参数，例如 `L-Localization-c-{table}.xlsx`。
+
+生成文件使用现有 Luban 表格式，保持原有元数据表头布局，数据行从 B 列开始填充（A 列为空），表头语言列为 `key | zh_CN`，文件扩展名为 `.xlsx`。外部人工本地化表优先于 inline value；inline key 在不同表中出现时 value 必须一致，合法空 value 会被保留。
+
 ### 增加自动导表的文件名称扩展识别
 
 #### 导出参数(必须配置)
