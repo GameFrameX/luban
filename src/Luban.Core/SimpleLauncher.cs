@@ -18,7 +18,7 @@ public class SimpleLauncher
 {
     private static readonly NLog.Logger s_logger = NLog.LogManager.GetCurrentClassLogger();
 
-    public void Start(Dictionary<string, string> options)
+    public void Start(Dictionary<string, List<string>> options)
     {
         EnvManager.Current = new EnvManager(options);
         InitManagers();

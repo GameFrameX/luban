@@ -4,9 +4,18 @@ public class EnvManager
 {
     public static EnvManager Current { get; set; }
 
-    private readonly Dictionary<string, string> _options;
+    private readonly Dictionary<string, List<string>> _options;
 
     public EnvManager(Dictionary<string, string> options)
+    {
+        _options = new Dictionary<string, List<string>>(options.Count);
+        foreach (var kv in options)
+        {
+            _options[kv.Key] = new List<string> { kv.Value };
+        }
+    }
+
+    public EnvManager(Dictionary<string, List<string>> options)
     {
         _options = options;
     }
@@ -18,12 +27,12 @@ public class EnvManager
 
     public string GetOptionRaw(string optionName)
     {
-        return _options.TryGetValue(optionName, out var value) ? value : null;
+        return _options.TryGetValue(optionName, out var values) && values.Count > 0 ? values[0] : null;
     }
 
     public string GetOptionOrDefaultRaw(string optionName, string defaultValue)
     {
-        return _options.TryGetValue(optionName, out var value) ? value : defaultValue;
+        return _options.TryGetValue(optionName, out var values) && values.Count > 0 ? values[0] : defaultValue;
     }
 
 
@@ -37,13 +46,15 @@ public class EnvManager
         while (true)
         {
             string fullOptionName = string.IsNullOrEmpty(namespaze) ? name : namespaze + "." + name;
-            if (_options.TryGetValue(fullOptionName, out value))
+            if (_options.TryGetValue(fullOptionName, out var values) && values.Count > 0)
             {
+                value = values[0];
                 return true;
             }
 
             if (string.IsNullOrEmpty(namespaze) || !useGlobalIfNotExits)
             {
+                value = null;
                 return false;
             }
 
@@ -81,6 +92,36 @@ public class EnvManager
             }
         }
         return defaultValue;
+    }
+
+    /// <summary>
+    /// 同名 option 的所有值，按命令行出现顺序。Option 缺失时返回空数组。
+    /// </summary>
+    public IReadOnlyList<string> GetOptionList(string namespaze, string name, bool useGlobalIfNotExits)
+    {
+        while (true)
+        {
+            string fullOptionName = string.IsNullOrEmpty(namespaze) ? name : namespaze + "." + name;
+            if (_options.TryGetValue(fullOptionName, out var values))
+            {
+                return values;
+            }
+
+            if (string.IsNullOrEmpty(namespaze) || !useGlobalIfNotExits)
+            {
+                return Array.Empty<string>();
+            }
+
+            int index = namespaze.LastIndexOf('.');
+            if (index < 0)
+            {
+                namespaze = "";
+            }
+            else
+            {
+                namespaze = namespaze.Substring(0, index);
+            }
+        }
     }
 
 }

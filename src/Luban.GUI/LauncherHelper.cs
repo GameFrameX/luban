@@ -196,9 +196,9 @@ internal static class LauncherHelper
     }
 
 
-    private static Dictionary<string, string> ParseXargs0(IEnumerable<string> xargs)
+    private static Dictionary<string, List<string>> ParseXargs0(IEnumerable<string> xargs)
     {
-        var result = new Dictionary<string, string>();
+        var result = new Dictionary<string, List<string>>();
         if (xargs == null)
         {
             return result;
@@ -212,22 +212,33 @@ internal static class LauncherHelper
                 throw new Exception($"invalid xargs:{arg}");
             }
 
-            if (!result.TryAdd(pair[0], pair[1]))
+            if (result.TryGetValue(pair[0], out var list))
             {
-                throw new Exception($"duplicate xargs:{arg}");
+                list.Add(pair[1]);
+            }
+            else
+            {
+                result[pair[0]] = new List<string> { pair[1] };
             }
         }
 
         return result;
     }
 
-    private static Dictionary<string, string> ParseXargs(IEnumerable<string> defaultXargs, IEnumerable<string> cmdXargs)
+    private static Dictionary<string, List<string>> ParseXargs(IEnumerable<string> defaultXargs, IEnumerable<string> cmdXargs)
     {
         var defaultXargsMap = ParseXargs0(defaultXargs);
         var cmdXargsMap = ParseXargs0(cmdXargs);
         foreach (var kv in cmdXargsMap)
         {
-            defaultXargsMap[kv.Key] = kv.Value;
+            if (defaultXargsMap.TryGetValue(kv.Key, out var existing))
+            {
+                existing.AddRange(kv.Value);
+            }
+            else
+            {
+                defaultXargsMap[kv.Key] = kv.Value;
+            }
         }
 
         return defaultXargsMap;
