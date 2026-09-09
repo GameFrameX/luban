@@ -110,16 +110,17 @@ internal static class InlineTextGenerator
         }
 
         // 计算 language 列的整行列索引（含 A 列）；如果 metadata 里没有则扩展
-        int languageColumnIndex = existing.FieldNames.IndexOf(language);
-        if (languageColumnIndex < 0)
+        int languageFieldIndex = existing.FieldNames.IndexOf(language);
+        bool languageColumnExisted = languageFieldIndex >= 0;
+        if (!languageColumnExisted)
         {
             // 新增 language 列到 metadata（##var/##type/##group 同步）
             existing.FieldNames.Add(language);
             existing.Types.Add("string");
             existing.Groups.Add("");
-            languageColumnIndex = existing.FieldNames.Count - 1;
+            languageFieldIndex = existing.FieldNames.Count - 1;
         }
-        languageColumnIndex += 1; // +1 因为 A 列占 0 索引
+        int languageColumnIndex = languageFieldIndex + 1; // +1 因为 A 列占 0 索引
 
         // 收集需要追加的新行（key 不在现有）
         var newRows = new List<string[]>();
@@ -132,6 +133,13 @@ internal static class InlineTextGenerator
             existingKeys.Add(entry.Key);
             var row = BuildDataRow(existing.FieldNames.Count + 1, languageColumnIndex, entry.Key, entry.Value);
             newRows.Add(row);
+        }
+
+        // 没有新 key 且 language 列已存在时文件无需任何变化；跳过重写，
+        // 避免内容相同但字节不同（例如文件被 Excel/WPS 保存过）导致 git 误报变更
+        if (newRows.Count == 0 && languageColumnExisted)
+        {
+            return;
         }
 
         InlineTextXlsxWriter.WriteMerge(fullPath, existing, newRows);
@@ -213,13 +221,14 @@ internal static class InlineTextGenerator
 internal sealed class InlineTextXlsxReader
 {
     /// <summary>
-    /// 现有 sheet 的内容：B+ 列的字段名、类型、组分组，以及所有数据行（A 列为空，B 列为 key）。
+    /// 现有 sheet 的内容：B+ 列的字段名、类型、组分组、## 注释行，以及所有数据行（A 列为空，B 列为 key）。
     /// </summary>
     public sealed class SheetData
     {
         public List<string> FieldNames { get; set; } = new();
         public List<string> Types { get; set; } = new();
         public List<string> Groups { get; set; } = new();
+        public List<List<string>> CommentRows { get; set; } = new();
         public List<List<string>> DataRows { get; set; } = new();
     }
 
@@ -233,6 +242,7 @@ internal sealed class InlineTextXlsxReader
         List<string> fieldNames = new();
         List<string> types = new();
         List<string> groups = new();
+        var commentRows = new List<List<string>>();
         var dataRows = new List<List<string>>();
         bool headerParsed = false;
 
@@ -282,7 +292,13 @@ internal sealed class InlineTextXlsxReader
             }
             else if (!string.IsNullOrEmpty(tag) && tag.StartsWith("##"))
             {
-                continue;
+                // ## 注释行原样保留，合并写回时不丢失
+                var row = new List<string>();
+                for (int i = 0; i < fieldCount; i++)
+                {
+                    row.Add(reader.GetValue(i)?.ToString() ?? "");
+                }
+                commentRows.Add(row);
             }
             else if (string.IsNullOrEmpty(tag) && fieldCount > 1 && !string.IsNullOrEmpty(reader.GetValue(1)?.ToString()))
             {
@@ -296,13 +312,35 @@ internal sealed class InlineTextXlsxReader
             rowIndex++;
         }
 
+        // 裁掉没有字段名的尾部空列（Excel/WPS 编辑时 dimension 扩展产生），
+        // 并让 type/group 与字段名对齐，避免合并写回时引入多余空列
+        while (fieldNames.Count > 0 && string.IsNullOrWhiteSpace(fieldNames[fieldNames.Count - 1]))
+        {
+            fieldNames.RemoveAt(fieldNames.Count - 1);
+        }
+        TrimOrPadToFieldCount(types, fieldNames.Count);
+        TrimOrPadToFieldCount(groups, fieldNames.Count);
+
         return new SheetData
         {
             FieldNames = fieldNames,
             Types = types,
             Groups = groups,
+            CommentRows = commentRows,
             DataRows = dataRows,
         };
+    }
+
+    private static void TrimOrPadToFieldCount(List<string> values, int fieldCount)
+    {
+        if (values.Count > fieldCount)
+        {
+            values.RemoveRange(fieldCount, values.Count - fieldCount);
+        }
+        while (values.Count < fieldCount)
+        {
+            values.Add("");
+        }
     }
 }
 
@@ -334,6 +372,17 @@ internal static class InlineTextXlsxWriter
         allRows.Add(AppendTag("##var", Enumerable.Range(0, existing.FieldNames.Count).Select(_ => "")));
         allRows.Add(AppendTag("##type", existing.Types));
         allRows.Add(AppendTag("##group", existing.Groups));
+
+        // ## 注释行原样写回，保持与全新生成的文件结构一致
+        foreach (var commentRow in existing.CommentRows)
+        {
+            var row = new string[existing.FieldNames.Count + 1];
+            for (int i = 0; i < row.Length; i++)
+            {
+                row[i] = i < commentRow.Count ? commentRow[i] : "";
+            }
+            allRows.Add(row);
+        }
 
         // 现有数据行：保持原列数和原值
         foreach (var dataRow in existing.DataRows)
