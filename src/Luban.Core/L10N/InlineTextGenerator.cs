@@ -99,13 +99,13 @@ internal static class InlineTextGenerator
     {
         var existing = InlineTextXlsxReader.Read(fullPath);
 
-        // 现有数据行的 key（B 列）作为保留集合
-        var existingKeys = new HashSet<string>(StringComparer.Ordinal);
+        // 现有数据行的 key（B 列）→ 行内容 的映射
+        var existingRowsByKey = new Dictionary<string, List<string>>(StringComparer.Ordinal);
         foreach (var row in existing.DataRows)
         {
             if (row.Count > 1 && !string.IsNullOrEmpty(row[1]))
             {
-                existingKeys.Add(row[1]);
+                existingRowsByKey[row[1]] = row;
             }
         }
 
@@ -122,22 +122,37 @@ internal static class InlineTextGenerator
         }
         int languageColumnIndex = languageFieldIndex + 1; // +1 因为 A 列占 0 索引
 
-        // 收集需要追加的新行（key 不在现有）
+        // 收集需要追加的新行（key 不在现有）；已存在的 key 同步 language 列 value
+        // （inline 提取的源语言列以业务表为准，其他语言列保留译者填写的内容）
         var newRows = new List<string[]>();
+        bool valueChanged = false;
+        var processedKeys = new HashSet<string>(StringComparer.Ordinal);
         foreach (var entry in entries.OrderBy(x => x.Key, StringComparer.Ordinal))
         {
-            if (existingKeys.Contains(entry.Key))
+            if (!processedKeys.Add(entry.Key))
             {
                 continue;
             }
-            existingKeys.Add(entry.Key);
+            if (existingRowsByKey.TryGetValue(entry.Key, out var existingRow))
+            {
+                while (existingRow.Count <= languageColumnIndex)
+                {
+                    existingRow.Add("");
+                }
+                if (existingRow[languageColumnIndex] != entry.Value)
+                {
+                    existingRow[languageColumnIndex] = entry.Value;
+                    valueChanged = true;
+                }
+                continue;
+            }
             var row = BuildDataRow(existing.FieldNames.Count + 1, languageColumnIndex, entry.Key, entry.Value);
             newRows.Add(row);
         }
 
-        // 没有新 key 且 language 列已存在时文件无需任何变化；跳过重写，
+        // 没有新 key、language 列已存在且 value 无变化时文件无需任何变化；跳过重写，
         // 避免内容相同但字节不同（例如文件被 Excel/WPS 保存过）导致 git 误报变更
-        if (newRows.Count == 0 && languageColumnExisted)
+        if (newRows.Count == 0 && languageColumnExisted && !valueChanged)
         {
             return;
         }
