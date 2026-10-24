@@ -1,0 +1,4 @@
+[
+  { "id": 1, "name": "item.sword", "shapeId": 1 },
+  { "id": 2, "name": "item.shield", "shapeId": 2 }
+]

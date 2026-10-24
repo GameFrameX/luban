@@ -1,0 +1,46 @@
+<module name="">
+  <!-- 多态 bean，子类自带 text 字段：TranslateText 按继承生成 virtual/override（24774645） -->
+  <bean name="Shape">
+    <var name="id" type="int"/>
+    <var name="label" type="text"/>
+    <bean name="Circle">
+      <var name="radius" type="float"/>
+      <var name="note" type="text"/>
+    </bean>
+    <bean name="Square">
+      <var name="side" type="float"/>
+    </bean>
+  </bean>
+
+  <!-- map 表 + 非空 ref 字段：重载清空 LongDataMaps（ff138c33）、ref 取值改用 TryGet（27b318b8） -->
+  <bean name="Item">
+    <var name="id" type="int"/>
+    <var name="name" type="text"/>
+    <var name="shapeId" type="int#ref=TbShape"/>
+  </bean>
+
+  <!-- list 表：LoadAsync override（ff138c33） -->
+  <bean name="Notice">
+    <var name="id" type="int"/>
+    <var name="content" type="string"/>
+  </bean>
+
+  <!-- one 表：LoadAsync override（ff138c33） -->
+  <bean name="Global">
+    <var name="maxItems" type="int"/>
+  </bean>
+
+  <!-- 0x 十六进制字面量：整型字段（dd520088）、分隔符 map key、多列标题 map key（a93ab40f） -->
+  <bean name="HexRow">
+    <var name="id" type="int"/>
+    <var name="flag" type="int"/>
+    <var name="weights" type="(map#sep=;),int,int"/>
+    <var name="bonus" type="map,int,int"/>
+  </bean>
+
+  <table name="TbShape" value="Shape" input="*@shape.json"/>
+  <table name="TbItem" value="Item" input="*@item.json"/>
+  <table name="TbNotice" value="Notice" mode="list" input="*@notice.json"/>
+  <table name="TbGlobal" value="Global" mode="one" input="global.json"/>
+  <table name="TbHex" value="HexRow" input="hex.csv"/>
+</module>

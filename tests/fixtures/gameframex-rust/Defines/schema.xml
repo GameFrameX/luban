@@ -1,0 +1,14 @@
+<module name="Battle">
+  <enum name="Kind">
+    <var name="A" value="1"/>
+  </enum>
+  <bean name="Pos">
+    <var name="x" type="int"/>
+  </bean>
+  <bean name="Unit">
+    <var name="id" type="int"/>
+    <var name="kind" type="Kind"/>
+    <var name="pos" type="Pos"/>
+  </bean>
+  <table name="TbUnit" value="Unit" input="*@unit.json"/>
+</module>
