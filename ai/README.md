@@ -20,6 +20,26 @@ luban_examples/Tools/build-luban.bat   # 或 build-luban.sh
 
 产出：`Tools/Luban`、`Tools/Luban.Agent`、`Tools/Luban.Mcp`。
 
+## 本机 agent 注册（Claude / Orca 等）
+
+将 `skills/` 下各技能目录原样复制到本机 agent 的 skill 目录（如 `~/.claude/skills/`），保留官方原名：
+
+```bash
+for skill in ai/skills/*/; do
+    cp -R "$skill" ~/.claude/skills/
+done
+```
+
+配合 MCP Server 使用时设置环境变量：
+
+```bash
+LUBAN_AGENT_DLL=<out>/Luban.Agent/Luban.Agent.dll
+LUBAN_DLL=<out>/Luban/Luban.dll
+LUBAN_DOC=<luban-doc>/docs   # 可选，供 SearchDocs
+```
+
+MCP 工具经 stdio 暴露为 snake_case 名称：`list_tables` / `get_schema` / `describe` / `validate` / `generate` / `search_docs`。
+
 ## 文档
 
 见 luban-doc：`docs/ai/`，以及站点 `/llms.txt`。
