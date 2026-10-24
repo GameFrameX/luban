@@ -207,7 +207,8 @@ public class DefAssembly
         }
         if (!TablesByName.TryAdd(table.Name, table))
         {
-throw new LubanException(table.Source, "error.def.table.duplicate_name", table.FullName, TablesByName[table.Name].FullName);
+            // GameFrameX：短表名重复只记录 Fatal 日志而不中断生成（74d27f66），便于定位 __tables__.xlsx 重复引入。
+            s_logger.Fatal(MessageCatalog.Format("error.def.table.duplicate_name", table.FullName, TablesByName[table.Name].FullName));
         }
     }
 

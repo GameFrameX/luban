@@ -1,0 +1,6 @@
+<module name="beta">
+  <bean name="Row">
+    <var name="id" type="int"/>
+  </bean>
+  <table name="TbDuplicate" value="Row" input="*@beta.json"/>
+</module>

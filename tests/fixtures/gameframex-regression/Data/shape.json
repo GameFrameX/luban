@@ -1,0 +1,4 @@
+[
+  { "$type": "Circle", "id": 1, "label": "shape.circle", "radius": 2.5, "note": "shape.circle.note" },
+  { "$type": "Square", "id": 2, "label": "shape.square", "side": 3.0 }
+]

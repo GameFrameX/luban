@@ -1,0 +1,4 @@
+##var,id,name,
+##type,int,text,
+,1,item.sword,剑
+,2,item.shield,盾
