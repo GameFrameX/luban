@@ -1,9 +1,30 @@
-using System.Xml.Linq;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Defs;
 using Luban.Types;
 using Luban.TypeVisitors;
 using Luban.Utils;
+using System.Xml.Linq;
 
 namespace Luban.DataLoader.Builtin.DataVisitors;
 
@@ -94,7 +115,7 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
             }
             if (string.IsNullOrWhiteSpace(subType))
             {
-                throw new Exception($"bean:'{bean.FullName}'是多态，需要指定{FieldNames.XmlTypeNameKey}属性.\n xml:{x}");
+                throw new LubanException("error.data.polymorphic_need_type", bean.FullName, FieldNames.XmlTypeNameKey);
             }
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
         }
@@ -114,7 +135,7 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
                     fields.Add(null);
                     continue;
                 }
-                throw new Exception($"字段:{f.Name} 缺失");
+                throw new LubanException("error.data.missing_field", implBean.FullName, f.Name);
             }
             try
             {
@@ -170,7 +191,7 @@ class XmlDataCreator : ITypeFuncVisitor<XElement, DefAssembly, DType>
             DType value = type.ValueType.Apply(this, e.Element("value"), ass);
             if (!map.TryAdd(key, value))
             {
-                throw new Exception($"map 的 key:{key} 重复");
+                throw new LubanException("error.data.map_duplicate_key", key);
             }
         }
         return new DMap(type, map);

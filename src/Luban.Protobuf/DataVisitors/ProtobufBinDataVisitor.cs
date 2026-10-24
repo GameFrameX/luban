@@ -1,7 +1,26 @@
-﻿using Google.Protobuf;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Google.Protobuf;
 using Luban.Datas;
 using Luban.DataVisitors;
-using Luban.Defs;
 using Luban.Protobuf.TypeVisitors;
 using Luban.Types;
 using Luban.Utils;
@@ -210,17 +229,18 @@ public class ProtobufBinDataVisitor : IDataActionVisitor<CodedOutputStream>
         var keyType = type.Type.KeyType;
         var valueType = type.Type.ValueType;
         var ms = AllocMemoryStream();
-        foreach (var e in type.Datas)
+        foreach (var e in type.DataMap)
         {
             x.WriteTag(fieldId, WireFormat.WireType.LengthDelimited);
-            ms.Seek(0, SeekOrigin.Begin);
+            ms.Position = 0;
+            ms.SetLength(0);
             var temp = new CodedOutputStream(ms);
             temp.WriteTag(1, keyType.Apply(ProtobufWireTypeVisitor.Ins));
             e.Key.Apply(this, temp);
             temp.WriteTag(2, valueType.Apply(ProtobufWireTypeVisitor.Ins));
             e.Value.Apply(this, temp);
             temp.Flush();
-            ms.Seek(0, SeekOrigin.Begin);
+            ms.Position = 0;
             x.WriteBytes(ByteString.FromStream(ms));
 
         }

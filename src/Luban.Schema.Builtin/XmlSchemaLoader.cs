@@ -1,7 +1,29 @@
-using System.Xml.Linq;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using Luban.Defs;
+using Luban.Diagnostics;
 using Luban.RawDefs;
+using Luban.Schema;
 using Luban.Utils;
+using System.Xml.Linq;
 
 namespace Luban.Schema.Builtin;
 
@@ -25,6 +47,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         _tagHandlers.Add("bean", AddBean);
         _tagHandlers.Add("table", AddTable);
         _tagHandlers.Add("refgroup", AddRefGroup);
+        _tagHandlers.Add("constalias", AddConstAlias);
     }
 
     public override void Load(string fileName)
@@ -49,7 +72,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
             }
             else
             {
-                throw new LoadDefException($"定义文件:{_fileName} module:{CurNamespace} 不支持 tag:{tagName}");
+                throw new LubanException("error.schema.unsupported_tag", _fileName, CurNamespace, tagName);
             }
         }
         _namespaceStack.Pop();
@@ -62,7 +85,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         {
             if (!string.IsNullOrEmpty(parent))
             {
-                throw new Exception($"嵌套在'{parent}'中定义的子bean:'{XmlUtil.GetRequiredAttribute(e, "name")}' 不能再定义parent:{selfDefParent} 属性");
+                throw new LubanException("error.schema.nested_bean_parent", XmlUtil.GetRequiredAttribute(e, "name"), parent, selfDefParent);
             }
             parent = selfDefParent;
         }
@@ -79,6 +102,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         XmlSchemaUtil.ValidAttrKeys(_fileName, e, _enumOptionalAttrs, _enumRequiredAttrs);
         var en = new RawEnum()
         {
+            Source = SchemaSource.FromPath(_fileName),
             Name = XmlUtil.GetRequiredAttribute(e, "name").Trim(),
             Namespace = CurNamespace,
             Comment = XmlUtil.GetOptionalAttribute(e, "comment"),
@@ -115,7 +139,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
                 }
                 default:
                 {
-                    throw new Exception($"不支持的enum子节点:{item.Name.LocalName}");
+                    throw new LubanException("error.schema.unsupported_enum_child", item.Name.LocalName);
                 }
             }
         }
@@ -123,7 +147,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         Collector.Add(en);
     }
 
-    private readonly List<string> _tableOptionalAttrs = new() { "index", "mode", "group", "comment", "readSchemaFromFile", "output", "tags" };
+    private readonly List<string> _tableOptionalAttrs = new() { "index", "mode", "group", "comment", "readSchemaFromFile", "output", "tags", "variant" };
     private readonly List<string> _tableRequireAttrs = new() { "name", "value", "input" };
 
     private void AddTable(XElement e)
@@ -144,7 +168,8 @@ public class XmlSchemaLoader : SchemaLoaderBase
         string mode = XmlUtil.GetOptionalAttribute(e, "mode");
         string tags = XmlUtil.GetOptionalAttribute(e, "tags");
         string output = XmlUtil.GetOptionalAttribute(e, "output");
-        Collector.Add(SchemaLoaderUtil.CreateTable(_fileName, name, module, valueType, index, mode, group, comment, defineFromFile, input, tags, output));
+        string variant = XmlUtil.GetOptionalAttribute(e, "variant");
+        Collector.Add(SchemaLoaderUtil.CreateTable(_fileName, name, module, valueType, index, mode, group, comment, defineFromFile, input, tags, output, variant));
     }
 
     private static readonly List<string> _fieldOptionalAttrs = new()
@@ -201,7 +226,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
             string value = XmlUtil.GetRequiredAttribute(optionEle, "value");
             if (!opts.TryAdd(key, value))
             {
-                throw new Exception($"CreateTypeMapper {fullName} option:{key} 重复定义");
+                throw new LubanException("error.schema.duplicate_type_mapper_option", fullName, key);
             }
         }
         var mapper = new TypeMapper()
@@ -225,6 +250,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
         TryGetUpdateParent(e, ref parent);
         var b = new RawBean()
         {
+            Source = SchemaSource.FromPath(_fileName),
             Name = XmlUtil.GetRequiredAttribute(e, "name"),
             Namespace = CurNamespace,
             Parent = parent,
@@ -248,7 +274,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
                 {
                     if (defineAnyChildBean)
                     {
-                        throw new LoadDefException($"定义文件:{_fileName} 类型:{b.FullName} 的多态子bean必须在所有成员字段 <var> 之后定义");
+                        throw new LubanException("error.schema.polymorphic_bean_order", _fileName, b.FullName);
                     }
                     b.Fields.Add(CreateField(fe));
                     ;
@@ -267,7 +293,7 @@ public class XmlSchemaLoader : SchemaLoaderBase
                 }
                 default:
                 {
-                    throw new LoadDefException($"定义文件:{_fileName} 类型:{b.FullName} 不支持 tag:{fe.Name}");
+                    throw new LubanException("error.schema.unsupported_bean_tag", _fileName, b.FullName, fe.Name);
                 }
             }
         }
@@ -284,5 +310,20 @@ public class XmlSchemaLoader : SchemaLoaderBase
     private void AddRefGroup(XElement e)
     {
         Collector.Add(XmlSchemaUtil.CreateRefGroup(_fileName, e));
+    }
+
+    private void AddConstAlias(XElement e)
+    {
+        string name = XmlUtil.GetRequiredAttribute(e, "name");
+        string alias = XmlUtil.GetRequiredAttribute(e, "value");
+        if (string.IsNullOrEmpty(name))
+        {
+            throw new LubanException("error.schema.constalias_empty_name", _fileName);
+        }
+        if (string.IsNullOrEmpty(alias))
+        {
+            throw new LubanException("error.schema.constalias_empty_value", _fileName, name);
+        }
+        Collector.AddConstAlias(name, alias);
     }
 }

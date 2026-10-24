@@ -1,4 +1,27 @@
-﻿namespace Luban.Utils;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
+using System.Text;
+
+namespace Luban.Utils;
 
 public static class DefUtil
 {
@@ -33,10 +56,22 @@ public static class DefUtil
         }
 
         int braceDepth = 0;
-        int pairStart = 0;
+        var buf = new StringBuilder();
+        bool inEscape = false;
         for (int i = 0; i < tags.Length; i++)
         {
             var c = tags[i];
+            if (inEscape)
+            {
+                inEscape = false;
+                buf.Append(c);
+                continue;
+            }
+            if (c == '\\')
+            {
+                inEscape = true;
+                continue;
+            }
             if (c == '(' || c == '[' || c == '{')
             {
                 ++braceDepth;
@@ -48,18 +83,22 @@ public static class DefUtil
 
             if (braceDepth == 0 && c == '#')
             {
-                string rawPair = tags.Substring(pairStart, i - pairStart);
-                pairStart = i + 1;
+                string rawPair = buf.ToString();
+                buf.Clear();
                 AddAttr(am, rawPair);
+            }
+            else
+            {
+                buf.Append(c);
             }
         }
         if (braceDepth != 0)
         {
-            throw new Exception($"非法tags:{tags}");
+            throw new LubanException("error.schema.invalid_tags", tags);
         }
-        if (pairStart < tags.Length)
+        if (buf.Length > 0)
         {
-            AddAttr(am, tags.Substring(pairStart));
+            AddAttr(am, buf.ToString());
         }
         return am;
     }
@@ -185,7 +224,7 @@ public static class DefUtil
                 }
                 else
                 {
-                    throw new Exception($"type:{rawType} brace not match");
+                    throw new LubanException("error.schema.brace_not_match", rawType);
                 }
             }
         }
@@ -229,12 +268,12 @@ public static class DefUtil
 
         if (attrs.ContainsKey("group"))
         {
-            throw new Exception("group为保留属性,只能用于table或var定义,是否用错? 如在excel中请使用&group=xxx");
+            throw new LubanException("error.schema.group_reserved");
         }
 
         if (attrs.ContainsKey("seq"))
         {
-            throw new Exception("字段切割应该用'sep'，而不是'seq',请检查是否拼写错误");
+            throw new LubanException("error.schema.seq_typo");
         }
 
         return (typeStr, attrs);
@@ -253,7 +292,7 @@ public static class DefUtil
                 return false;
             default:
             {
-                throw new Exception($"orientation 属性值只能为row|r|column|c");
+                throw new LubanException("error.schema.invalid_orientation");
             }
         }
     }

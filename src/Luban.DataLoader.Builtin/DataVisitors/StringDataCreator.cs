@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Types;
 using Luban.TypeVisitors;
@@ -16,7 +37,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是bool类型");
+            throw new LubanException("error.data.invalid_bool_type", x);
         }
     }
 
@@ -28,7 +49,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是byte类型");
+            throw new LubanException("error.data.invalid_byte", x);
         }
     }
 
@@ -40,7 +61,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是short类型");
+            throw new LubanException("error.data.invalid_short", x);
         }
     }
 
@@ -61,7 +82,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是int类型");
+            throw new LubanException("error.data.invalid_int", x);
         }
     }
 
@@ -73,7 +94,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是long类型");
+            throw new LubanException("error.data.invalid_long", x);
         }
     }
 
@@ -85,7 +106,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是float类型");
+            throw new LubanException("error.data.invalid_float", x);
         }
     }
 
@@ -97,7 +118,7 @@ class StringDataCreator : ITypeFuncVisitor<string, DType>
         }
         else
         {
-            throw new Exception($"{x} 不是double类型");
+            throw new LubanException("error.data.invalid_double", x);
         }
     }
 

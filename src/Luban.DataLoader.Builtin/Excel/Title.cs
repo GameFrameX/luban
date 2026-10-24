@@ -1,4 +1,25 @@
-﻿using Luban.Utils;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
+using Luban.Utils;
 
 namespace Luban.DataLoader.Builtin.Excel;
 
@@ -49,7 +70,7 @@ public class Title
     {
         if (!SubTitles.TryAdd(title.Name, title))
         {
-            throw new Exception($"列:{title.Name} 重复");
+            throw new LubanException("error.excel.duplicate_column", title.Name);
         }
         SubTitleList.Add(title);
     }
@@ -72,6 +93,7 @@ public class Title
         "non_empty",
         "multi_rows",
         "default",
+        "format",
     };
 
     public void Init()
@@ -90,7 +112,7 @@ public class Title
         {
             if (!s_validTags.Contains(key))
             {
-                throw new Exception($"excel标题列:'{Name}' 不支持tag:'{key}',请移到##type行");
+                throw new LubanException("error.excel.title_tag_unsupported", Name, key);
             }
         }
 

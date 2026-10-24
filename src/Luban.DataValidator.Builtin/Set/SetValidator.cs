@@ -1,7 +1,27 @@
-﻿using Luban.Datas;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Datas;
 using Luban.Defs;
+using Luban.Diagnostics;
 using Luban.Types;
-using Luban.Utils;
 using Luban.Validator;
 
 namespace Luban.DataValidator.Builtin.Set;
@@ -67,7 +87,7 @@ public class SetValidator : DataValidatorBase
             }
             default:
             {
-                throw new Exception($"set not support type:{type} field:{field}");
+                throw new LubanException("error.validator.set.unsupported_type", type, field);
             }
         }
     }
@@ -76,7 +96,7 @@ public class SetValidator : DataValidatorBase
     {
         if ((_longSet != null && !_longSet.Contains(_longGetter(data))) || (_stringSet != null && !_stringSet.Contains(_stringGetter(data))))
         {
-            s_logger.Error("记录 {}:{} (来自文件:{}) 值不在set:{}中", RecordPath, data, Source, _valueSetStr);
+            s_logger.Error(MessageCatalog.Format("error.validator.set.not_in_set", RecordPath, data, Source, _valueSetStr));
             GenerationContext.Current.LogValidatorFail(this);
         }
     }

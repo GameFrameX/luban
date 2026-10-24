@@ -1,4 +1,25 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using Luban.DataLoader.Builtin.DataVisitors;
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Defs;
 using Luban.Types;
@@ -11,6 +32,7 @@ namespace Luban.DataLoader.Builtin.Excel;
 [DataLoader("xlsm")]
 [DataLoader("xlm")]
 [DataLoader("csv")]
+[DataLoader("tsv")]
 public class ExcelRowColumnDataSource : DataLoaderBase
 {
     private static readonly NLog.Logger s_logger = NLog.LogManager.GetCurrentClassLogger();
@@ -25,7 +47,7 @@ public class ExcelRowColumnDataSource : DataLoaderBase
         var rawSheets = SheetLoadUtil.LoadRawSheets(rawUrl, sheetName, stream);
         foreach (RawSheet rawSheet in rawSheets)
         {
-            var sheet = new RowColumnSheet(rawUrl, sheetName, rawSheet.SheetName);
+            var sheet = new RowColumnSheet(rawUrl, rawSheet.SheetName);
             sheet.Load(rawSheet);
             _sheets.Add(sheet);
         }
@@ -34,22 +56,12 @@ public class ExcelRowColumnDataSource : DataLoaderBase
         {
             if (!string.IsNullOrWhiteSpace(sheetName))
             {
-                throw new Exception($"excel:‘{rawUrl}’ sheet:‘{sheetName}’ 不存在或者不是有效的单元簿(有效单元薄的A0单元格必须是##)");
+                throw new LubanException("error.excel.sheet_not_found", rawUrl, sheetName);
             }
             else
             {
-                throw new Exception($"excel: ‘{rawUrl}’ 不包含有效的单元薄(有效单元薄的A0单元格必须是##).");
+                throw new LubanException("error.excel.no_valid_sheet", rawUrl);
             }
-        }
-    }
-
-    public void Load(params RawSheet[] rawSheets)
-    {
-        foreach (RawSheet rawSheet in rawSheets)
-        {
-            var sheet = new RowColumnSheet("__intern__", rawSheet.TableName, rawSheet.SheetName);
-            sheet.Load(rawSheet);
-            _sheets.Add(sheet);
         }
     }
 
@@ -84,7 +96,7 @@ public class ExcelRowColumnDataSource : DataLoaderBase
             }
             catch (Exception e)
             {
-                throw new Exception($"sheet:{sheet.Name}", e);
+                throw new LubanException(e, "error.excel.sheet_error", sheet.SheetName);
             }
         }
         return datas;
@@ -92,6 +104,6 @@ public class ExcelRowColumnDataSource : DataLoaderBase
 
     public override Record ReadOne(TBean type)
     {
-        throw new Exception($"excel不支持单例读取模式");
+        throw new LubanException("error.excel.singleton_unsupported");
     }
 }

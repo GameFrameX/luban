@@ -1,3 +1,23 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using System.Collections;
 using System.Security.Cryptography;
 using System.Text;
@@ -106,6 +126,7 @@ public static class FileUtil
     public static bool IsExcelFile(string fullName)
     {
         return fullName.EndsWith(".csv", StringComparison.Ordinal)
+               || fullName.EndsWith(".tsv", StringComparison.Ordinal)
                || fullName.EndsWith(".xls", StringComparison.Ordinal)
                || fullName.EndsWith(".xlsx", StringComparison.Ordinal)
                || fullName.EndsWith(".xlsm", StringComparison.Ordinal);
@@ -230,12 +251,30 @@ public static class FileUtil
     {
         baseDir = Path.GetFullPath(baseDir.Replace('\\', '/'));
         file = Path.GetFullPath(file.Replace('\\', '/'));
-        // if baseDir contains '.' or '_', we shouldn't ignore it.
-        if (file.Length > baseDir.Length && file.StartsWith(baseDir) && (file[baseDir.Length] == '\\' || file[baseDir.Length] == '/'))
+
+        // find common parent directory,
+        var baseDirParts = baseDir.Split('\\', '/');
+        var fileParts = file.Split('\\', '/');
+
+        int maxCommonLength = Math.Min(baseDirParts.Length, fileParts.Length);
+        int firstDiffIndex = maxCommonLength;
+        for (int i = 0; i < maxCommonLength; i++)
         {
-            file = file[(baseDir.Length + 1)..];
+            if (!baseDirParts[i].Equals(fileParts[i], StringComparison.OrdinalIgnoreCase))
+            {
+                firstDiffIndex = i;
+                break;
+            }
         }
-        return file.Split('\\', '/').Any(fileName => fileName.StartsWith(".") || fileName.StartsWith("_") || fileName.StartsWith("~"));
+        for (int i = firstDiffIndex; i < fileParts.Length; i++)
+        {
+            string part = fileParts[i];
+            if (part.StartsWith(".") || part.StartsWith("_") || part.StartsWith("~"))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static List<string> GetFileOrDirectory(string baseDir, string fileOrDirectory)
@@ -265,8 +304,13 @@ public static class FileUtil
         return files;
     }
 
-    public static string GetExtensionWithDot(string file)
+    public static string GetExtensionWithoutDot(string file)
     {
-        return Path.GetExtension(file).Substring(1);
+        string ext = Path.GetExtension(file);
+        if (string.IsNullOrEmpty(ext))
+        {
+            return "";
+        }
+        return ext.Substring(1);
     }
 }

@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.DataVisitors;
 using Luban.Types;
 
@@ -6,28 +27,28 @@ namespace Luban.Datas;
 public class DMap : DType
 {
     public TMap Type { get; }
-    public Dictionary<DType, DType> Datas { get; }
+    public Dictionary<DType, DType> DataMap { get; }
 
     public override string TypeName => "map";
 
     public DMap(TMap type, Dictionary<DType, DType> datas)
     {
         this.Type = type;
-        this.Datas = datas;
+        this.DataMap = datas;
 
         var set = new HashSet<DType>();
         foreach (var key in datas.Keys)
         {
             if (!set.Add(key))
             {
-                throw new Exception($"set 的 value:{key} 重复");
+                throw new LubanException("error.data.map_duplicate_key", key);
             }
         }
     }
 
     public override bool Equals(object obj)
     {
-        return obj is DMap d && Datas.Count == d.Datas.Count && Datas.All(e => d.Datas.TryGetValue(e.Key, out var v) && object.Equals(e.Value, v));
+        return obj is DMap d && DataMap.Count == d.DataMap.Count && DataMap.All(e => d.DataMap.TryGetValue(e.Key, out var v) && object.Equals(e.Value, v));
     }
 
     public override int GetHashCode()

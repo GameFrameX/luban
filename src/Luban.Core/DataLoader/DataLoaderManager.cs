@@ -1,7 +1,27 @@
-using System.Reflection;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.CustomBehaviour;
-using Luban.Datas;
 using Luban.Defs;
+using Luban.Pipeline;
 using Luban.Types;
 using Luban.Utils;
 
@@ -11,7 +31,7 @@ public class DataLoaderManager
 {
     private static readonly NLog.Logger s_logger = NLog.LogManager.GetCurrentClassLogger();
 
-    public static DataLoaderManager Ins { get; } = new();
+    public static DataLoaderManager Ins => PipelineScope.Current.DataLoaders;
 
     public void Init()
     {
@@ -55,9 +75,9 @@ public class DataLoaderManager
             s_logger.Trace("load table:{} file:{}", table.FullName, file);
             if (!File.Exists(file) && !Directory.Exists(file))
             {
-                throw new Exception($"'{table.FullName}'的input文件或目录不存在: {file} ");
+                throw new LubanException("error.data.input_not_exist", table.FullName, file);
             }
-            string loaderName = options.TryGetValue("loader", out var name) ? name : FileUtil.GetExtensionWithDot(file);
+            string loaderName = options.TryGetValue("loader", out var name) ? name : FileUtil.GetExtensionWithoutDot(file);
             var loader = CreateDataLoader(loaderName);
             using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             loader.Load(file, subAssetName, stream);
@@ -77,7 +97,7 @@ public class DataLoaderManager
         }
         catch (Exception e)
         {
-            throw new Exception($"LoadTableFile fail. {file}", e);
+            throw new LubanException(e, "error.data.load_table_file_fail", file);
         }
     }
 
@@ -85,7 +105,7 @@ public class DataLoaderManager
     {
         try
         {
-            string loaderName = options.TryGetValue("loader", out var name) ? name : FileUtil.GetExtensionWithDot(file);
+            string loaderName = options.TryGetValue("loader", out var name) ? name : FileUtil.GetExtensionWithoutDot(file);
             var loader = CreateDataLoader(loaderName);
             using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             loader.Load(file, subAssetName, stream);
@@ -105,7 +125,7 @@ public class DataLoaderManager
         }
         catch (Exception e)
         {
-            throw new Exception($"LoadTableFile fail. {file}", e);
+            throw new LubanException(e, "error.data.load_table_file_fail", file);
         }
     }
 

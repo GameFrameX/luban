@@ -1,4 +1,4 @@
-﻿<!--
+<!--
   - MIT License
   -
   - Copyright (c) 2023 Code Philosophy Technology Ltd.
@@ -42,6 +42,17 @@
       <PackageReference Include="NLog" Version="6.2.0" />
       <PackageReference Include="Scriban" Version="7.2.7" />
       <PackageReference Include="ExcelDataReader" Version="3.9.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="Resources\messages_en.json">
+        <LogicalName>Luban.Resources.messages_en.json</LogicalName>
+        <WithCulture>false</WithCulture>
+      </EmbeddedResource>
+      <EmbeddedResource Include="Resources\messages_zh.json">
+        <LogicalName>Luban.Resources.messages_zh.json</LogicalName>
+        <WithCulture>false</WithCulture>
+      </EmbeddedResource>
     </ItemGroup>
 
 </Project>

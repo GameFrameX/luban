@@ -1,6 +1,27 @@
-using System.Reflection;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.CustomBehaviour;
-using Luban.Utils;
+using Luban.Pipeline;
+using System.Reflection;
 
 namespace Luban.Schema;
 
@@ -8,7 +29,7 @@ public class SchemaManager
 {
     private static readonly NLog.Logger s_logger = NLog.LogManager.GetCurrentClassLogger();
 
-    public static SchemaManager Ins { get; } = new();
+    public static SchemaManager Ins => PipelineScope.Current.Schema;
 
     private class LoaderInfo
     {
@@ -42,7 +63,7 @@ public class SchemaManager
     {
         if (!_schemaLoaders.TryGetValue((extName, type), out var loader))
         {
-            throw new Exception($"can't find schema loader for type:{type} extName:{extName}");
+            throw new LubanException("error.schema.loader_not_found", type, extName);
         }
 
         ISchemaLoader schemaLoader = loader.Creator();
@@ -57,7 +78,7 @@ public class SchemaManager
         {
             if (loader.Priority >= priority)
             {
-                s_logger.Warn("schema loader creator already exist. type:{} priority:{} extName:{}", type, priority, extName);
+                s_logger.Warn(MessageCatalog.Format("warn.schema.loader_exists", type, priority, extName));
                 return;
             }
         }
