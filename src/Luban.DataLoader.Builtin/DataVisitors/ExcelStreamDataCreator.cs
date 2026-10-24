@@ -1,5 +1,26 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using Luban.DataLoader.Builtin.Excel;
 using Luban.DataLoader.Builtin.Utils;
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Defs;
 using Luban.Types;
@@ -45,9 +66,9 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
-        if (!byte.TryParse(d.ToString(), out byte v))
+        if (!LoadDataUtil.TryParseExcelByteFromNumberOrConstAlias(d.ToString(), out byte v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 byte 类型值");
+            throw new LubanException("error.data.invalid_byte", d);
         }
         return DByte.ValueOf(v);
     }
@@ -59,9 +80,9 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             return null;
         }
-        if (!short.TryParse(d.ToString(), out short v))
+        if (!LoadDataUtil.TryParseExcelShortFromNumberOrConstAlias(d.ToString(), out short v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 short 类型值");
+            throw new LubanException("error.data.invalid_short", d);
         }
         return DShort.ValueOf(v);
     }
@@ -81,9 +102,9 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         //        return DInt.ValueOf(c);
         //    }
         //}
-        if (!int.TryParse(ds, out var v))
+        if (!LoadDataUtil.TryParseExcelIntFromNumberOrConstAlias(ds, out var v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 int 类型值");
+            throw new LubanException("error.data.invalid_int", d);
         }
         return DInt.ValueOf(v);
     }
@@ -103,9 +124,9 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         //        return DLong.ValueOf(c);
         //    }
         //}
-        if (!long.TryParse(ds, out var v))
+        if (!LoadDataUtil.TryParseExcelLongFromNumberOrConstAlias(ds, out var v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 long 类型值");
+            throw new LubanException("error.data.invalid_long", d);
         }
         return DLong.ValueOf(v);
     }
@@ -119,7 +140,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         }
         if (!float.TryParse(d.ToString(), out var v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 float 类型值");
+            throw new LubanException("error.data.invalid_float", d);
         }
         return DFloat.ValueOf(v);
     }
@@ -133,7 +154,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         }
         if (!double.TryParse(d.ToString(), out var v))
         {
-            throw new InvalidExcelDataException($"{d} 不是 double 类型值");
+            throw new LubanException("error.data.invalid_double", d);
         }
         return DDouble.ValueOf(v);
     }
@@ -147,7 +168,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         }
         if (d == null)
         {
-            throw new InvalidExcelDataException($"枚举值不能为空");
+            throw new LubanException("error.data.enum_empty");
         }
         return new DEnum(type, d.ToString().Trim());
     }
@@ -162,7 +183,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
             {
                 return null;
             }
-            throw new InvalidExcelDataException("字段不是nullable类型，不能为null");
+            throw new LubanException("error.data.not_nullable");
         }
         return DString.ValueOf(type, s);
     }
@@ -232,7 +253,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
             {
                 if (!type.IsNullable)
                 {
-                    throw new InvalidExcelDataException($"type:{originBean.FullName}不是可空类型. 不能为空");
+                    throw new LubanException("error.data.bean_not_nullable", originBean.FullName);
                 }
                 return null;
             }
@@ -243,7 +264,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
         {
             if (type.IsNullable)
             {
-                if (x.TryPeed(out object subTypeObj)) //ToString().Trim();
+                if (x.TryPeek(out object subTypeObj)) //ToString().Trim();
                 {
                     string subType = subTypeObj.ToString().Trim();
 
@@ -314,7 +335,7 @@ class ExcelStreamDataCreator : ITypeFuncVisitor<ExcelStream, DType>
             var value = type.ValueType.Apply(this, stream);
             if (!datas.TryAdd(key, value))
             {
-                throw new InvalidExcelDataException($"map 的 key:{key} 重复");
+                throw new LubanException("error.data.map_duplicate_key", key);
             }
         }
         return new DMap(type, datas);

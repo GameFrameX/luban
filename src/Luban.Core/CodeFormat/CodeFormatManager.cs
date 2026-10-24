@@ -1,7 +1,29 @@
-using System.Reflection;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.CodeFormat.CodeStyles;
 using Luban.CustomBehaviour;
+using Luban.Pipeline;
 using NLog;
+using System.Reflection;
 
 namespace Luban.CodeFormat;
 
@@ -9,7 +31,7 @@ public class CodeFormatManager
 {
     private static readonly ILogger s_logger = LogManager.GetCurrentClassLogger();
 
-    public static CodeFormatManager Ins { get; } = new();
+    public static CodeFormatManager Ins => PipelineScope.Current.CodeFormat;
 
 
     public ICodeStyle NoneCodeStyle { get; private set; }
@@ -28,6 +50,8 @@ public class CodeFormatManager
 
     public ICodeStyle PythonDefaultCodeStyle { get; private set; }
 
+    public ICodeStyle DartDefaultCodeStyle { get; private set; }
+
     public void Init()
     {
     }
@@ -42,6 +66,7 @@ public class CodeFormatManager
         TypescriptDefaultCodeStyle = RegisterCodeStyle("typescript-default", "pascal", "pascal", "camel", "camel", "camel", "none");
         CppDefaultCodeStyle = RegisterCodeStyle("cpp-default", "snake", "pascal", "pascal", "pascal", "camel", "none");
         PythonDefaultCodeStyle = RegisterCodeStyle("python-default", "snake", "pascal", "snake", "snake", "snake", "none");
+        DartDefaultCodeStyle = RegisterCodeStyle("dart-default", "pascal", "pascal", "camel", "camel", "camel", "none");
     }
 
     public INamingConventionFormatter CreateFormatter(string formatterName)
@@ -76,7 +101,7 @@ public class CodeFormatManager
             {
                 if (!typeof(ICodeStyle).IsAssignableFrom(type))
                 {
-                    throw new Exception($"type:{type.FullName} not implement interface:{typeof(ICodeStyle).FullName}");
+                    throw new LubanException("error.codegen.code_style_interface", type.FullName, typeof(ICodeStyle).FullName);
                 }
                 var codeStyle = (ICodeStyle)Activator.CreateInstance(type);
                 RegisterCodeStyle(attr.Name, codeStyle);

@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.RawDefs;
 using Luban.Types;
 using Luban.TypeVisitors;
@@ -25,6 +46,8 @@ public class DefTable : DefTypeBase
         ReadSchemaFromFile = b.ReadSchemaFromFile;
         Tags = b.Tags;
         _outputFile = b.OutputFile;
+        CurrentVariant = b.CurrentVariant ?? "";
+        Source = b.Source;
     }
 
     public string Index { get; private set; }
@@ -34,6 +57,11 @@ public class DefTable : DefTypeBase
     public TableMode Mode { get; }
 
     public bool ReadSchemaFromFile { get; }
+
+    /// <summary>
+    /// Selected variant name after resolve. Empty when the fallback table definition is used.
+    /// </summary>
+    public string CurrentVariant { get; }
 
     public bool IsSingletonTable => Mode == TableMode.ONE;
 
@@ -73,7 +101,7 @@ public class DefTable : DefTypeBase
 
         if ((ValueTType = (TBean)ass.CreateType(Namespace, ValueType, false)) == null)
         {
-            throw new Exception($"table:'{FullName}' 的 value类型:'{ValueType}' 不存在");
+            throw new LubanException(Source, "error.def.table.value_type_not_exist", FullName, ValueType);
         }
 
         switch (Mode)
@@ -92,21 +120,31 @@ public class DefTable : DefTypeBase
                 {
                     if (ValueTType.DefBean.TryGetField(Index, out var f, out var i))
                     {
+                        if(!f.NeedExport() && this.NeedExport())
+                        {
+                            throw new LubanException(Source, "error.def.table.index_not_exported", FullName, f.Name);
+                        }
                         IndexField = f;
                         IndexFieldIdIndex = i;
                     }
                     else
                     {
-                        throw new Exception($"table:'{FullName}' index:'{Index}' 字段不存在");
+                        throw new LubanException(Source, "error.def.table.index_not_exist", FullName, Index);
                     }
                 }
                 else if (ValueTType.DefBean.HierarchyFields.Count == 0)
                 {
-                    throw new Exception($"table:'{FullName}' 必须定义至少一个字段");
+                    throw new LubanException(Source, "error.def.table.no_field", FullName);
                 }
                 else
                 {
-                    IndexField = ValueTType.DefBean.HierarchyFields[0];
+                    var f = ValueTType.DefBean.HierarchyFields[0];
+
+                    if (!f.NeedExport() && this.NeedExport())
+                    {
+                        throw new LubanException(Source, "error.def.table.default_index_not_exported", FullName, f.Name);
+                    }
+                    IndexField = f;
                     Index = IndexField.Name;
                     IndexFieldIdIndex = 0;
                 }
@@ -131,7 +169,7 @@ public class DefTable : DefTypeBase
                     }
                     else
                     {
-                        throw new Exception($"table:'{FullName}' index:'{idx}' 字段不存在");
+                        throw new LubanException(Source, "error.def.table.index_not_exist", FullName, idx);
                     }
                 }
                 // 如果不是 union index, 每个key必须唯一，否则 (key1,..,key n)唯一
@@ -140,7 +178,7 @@ public class DefTable : DefTypeBase
                 break;
             }
             default:
-                throw new Exception($"unknown mode:'{Mode}'");
+                throw new LubanException(Source, "error.def.table.unknown_mode", Mode);
         }
 
         foreach (var index in IndexList)
@@ -149,11 +187,11 @@ public class DefTable : DefTypeBase
             string idxName = index.IndexField.Name;
             if (indexType.IsNullable)
             {
-                throw new Exception($"table:'{FullName}' index:'{idxName}' 不能为 nullable类型");
+                throw new LubanException(Source, "error.def.table.index_nullable", FullName, idxName);
             }
             if (!indexType.Apply(IsValidTableKeyTypeVisitor.Ins))
             {
-                throw new Exception($"table:'{FullName}' index:'{idxName}' 的类型:'{index.IndexField.Type}' 不能作为index");
+                throw new LubanException(Source, "error.def.table.index_invalid_type", FullName, idxName, index.IndexField.Type);
             }
         }
     }

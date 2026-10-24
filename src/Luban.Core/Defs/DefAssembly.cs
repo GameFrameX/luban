@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.RawDefs;
 using Luban.Types;
 using Luban.Utils;
@@ -13,6 +34,8 @@ public class DefAssembly
     public List<DefTypeBase> TypeList { get; } = new();
 
     private readonly Dictionary<string, DefTypeBase> _notCaseSenseTypes = new();
+
+    private readonly Dictionary<string, string> _constAliases = new();
 
     private readonly HashSet<string> _namespaces = new();
 
@@ -59,15 +82,32 @@ public class DefAssembly
         return _variants.TryGetValue("default", out variantName);
     }
 
+    public bool TryGetConstAlias(string alias, out string value)
+    {
+        return _constAliases.TryGetValue(alias, out value);
+    }
+
     public DefAssembly(RawAssembly assembly, string target, List<string> outputTables, List<RawGroup> groupDefs, Dictionary<string, string> variants)
     {
         _targets = assembly.Targets;
         Target = GetTarget(target);
         if (Target == null)
         {
-            throw new Exception($"target:{target} is invalid");
+            throw new LubanException("error.def.target.invalid", target);
+        }
+        foreach (var g in Target.Groups)
+        {
+            if (groupDefs.All(d => !d.Names.Contains(g)))
+            {
+                throw new LubanException("error.def.target.group_not_defined", target, g);
+            }
         }
         _variants = variants;
+
+        foreach (var c in assembly.ConstAliases)
+        {
+            _constAliases.Add(c.Key, c.Value);
+        }
 
         foreach (var g in assembly.RefGroups)
         {
@@ -110,7 +150,7 @@ public class DefAssembly
                 }
                 else
                 {
-                    throw new Exception($"outputTable:{tableName} not found");
+                    throw new LubanException("error.def.output_table_not_found", tableName);
                 }
             }
         }
@@ -163,11 +203,11 @@ public class DefAssembly
     {
         if (!TablesByFullName.TryAdd(table.FullName, table))
         {
-            throw new Exception($"table:'{table.FullName}' duplicated");
+            throw new LubanException(table.Source, "error.def.table.duplicated", table.FullName);
         }
         if (!TablesByName.TryAdd(table.Name, table))
         {
-            s_logger.Fatal($"table:'{table.FullName} 与 table:'{TablesByName[table.Name].FullName}' 的表名重复(不同模块下也不允许定义同名表，将来可能会放开限制),请查看__tables__.xlsx文件中是否重复引入");
+throw new LubanException(table.Source, "error.def.table.duplicate_name", table.FullName, TablesByName[table.Name].FullName);
         }
     }
 
@@ -186,7 +226,7 @@ public class DefAssembly
     {
         if (_refGroups.ContainsKey(g.Name))
         {
-            throw new Exception($"refgroup:{g.Name} 重复");
+            throw new LubanException("error.def.refgroup.duplicate", g.Name);
         }
         _refGroups.Add(g.Name, new DefRefGroup(g));
     }
@@ -201,18 +241,18 @@ public class DefAssembly
         string fullName = type.FullName;
         if (Types.ContainsKey(fullName))
         {
-            throw new Exception($"type:'{fullName}' duplicate");
+            throw new LubanException(type.Source, "error.def.type.duplicate", fullName);
         }
 
         if (!_notCaseSenseTypes.TryAdd(fullName.ToLower(), type))
         {
-            throw new Exception($"type:'{fullName}' 和 type:'{_notCaseSenseTypes[fullName.ToLower()].FullName}' 类名小写重复. 在win平台有问题");
+            throw new LubanException(type.Source, "error.def.type.duplicate_case_insensitive", fullName, _notCaseSenseTypes[fullName.ToLower()].FullName);
         }
 
         string namespaze = type.Namespace;
         if (_namespaces.Add(namespaze) && !_notCaseSenseNamespaces.TryAdd(namespaze.ToLower(), type))
         {
-            throw new Exception($"type:'{fullName}' 和 type:'{_notCaseSenseNamespaces[namespaze.ToLower()].FullName}' 命名空间小写重复. 在win平台有问题，请修改定义并删除生成的代码目录后再重新生成");
+            throw new LubanException(type.Source, "error.def.type.duplicate_namespace_case_insensitive", fullName, _notCaseSenseNamespaces[namespaze.ToLower()].FullName);
         }
 
         Types.Add(fullName, type);
@@ -324,7 +364,7 @@ public class DefAssembly
             {
                 if (containerElementType)
                 {
-                    throw new Exception($"container element type can't be nullable type:'{module}.{type}'");
+                    throw new LubanException("error.def.container.nullable_element", module, type);
                 }
                 nullable = true;
                 type = type[..^1];
@@ -419,7 +459,7 @@ public class DefAssembly
                 TType type = CreateType(module, elementType, true);
                 if (type.IsCollection)
                 {
-                    throw new Exception("set的元素不支持容器类型");
+                    throw new LubanException("error.def.set.container_element");
                 }
                 return TSet.Create(false, containerTags, type, false);
             }

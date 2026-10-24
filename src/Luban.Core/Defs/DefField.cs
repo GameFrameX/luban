@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.RawDefs;
 using Luban.Types;
 using Luban.Utils;
@@ -84,14 +105,14 @@ public class DefField
             {
                 if (!Variants.Contains(variantName))
                 {
-                    throw new Exception($"type:'{HostType.FullName}' field:'{Name}' variantKey:'{variantKey}' exists, but variantName'{variantName}' not in {string.Join(",", Variants)}");
+                    throw new LubanException(HostType.Source, "error.def.field.variant_not_in_list", HostType.FullName, Name, variantKey, variantName, string.Join(",", Variants));
                 }
                 CurrentVariantNameWithoutFieldName = variantName;
                 CurrentVariantNameWithFieldName = $"{Name}@{variantName}";
             }
             else
             {
-                s_logger.Warn($"type:'{HostType.FullName}' field:'{Name}' not set variant. please set variant by command line option '--variant {variantKey}=<variantName>'");
+                s_logger.Warn(MessageCatalog.Format("warn.def.field.variant_not_set", HostType.FullName, Name, variantKey));
             }
         }
         try
@@ -100,7 +121,7 @@ public class DefField
         }
         catch (Exception e)
         {
-            throw new Exception($"type:'{HostType.FullName}' field:'{Name}' type:'{Type}' is invalid", e);
+            throw new LubanException(e, HostType.Source, "error.def.field.invalid_type", HostType.FullName, Name, Type);
         }
 
         //if (IsNullable && (CType.IsCollection || (CType is TBean)))
@@ -114,7 +135,7 @@ public class DefField
             {
                 if (t.ElementType is TBean e && !e.IsDynamic && e.DefBean.HierarchyFields.Count == 0)
                 {
-                    throw new Exception($"container element type:'{e.DefBean.FullName}' can't be empty bean");
+                    throw new LubanException(e.DefBean.Source, "error.def.container.empty_bean", e.DefBean.FullName);
                 }
                 break;
             }
@@ -122,7 +143,7 @@ public class DefField
             {
                 if (t.ElementType is TBean e && !e.IsDynamic && e.DefBean.HierarchyFields.Count == 0)
                 {
-                    throw new Exception($"container element type:'{e.DefBean.FullName}' can't be empty bean");
+                    throw new LubanException(e.DefBean.Source, "error.def.container.empty_bean", e.DefBean.FullName);
                 }
                 break;
             }
@@ -146,15 +167,15 @@ public class DefField
             var name = f.Name;
             if (name.Length == 0)
             {
-                throw new Exception($"type:'{hostType.FullName}' field name can't be empty");
+                throw new LubanException(hostType.Source, "error.def.field.empty_name", hostType.FullName);
             }
             if (!names.Add(name))
             {
-                throw new Exception($"type:'{hostType.FullName}' 'field:{name}' duplicate");
+                throw new LubanException(hostType.Source, "error.def.field.duplicate", hostType.FullName, name);
             }
             if (TypeUtil.ToCsStyleName(name) == hostType.Name)
             {
-                throw new Exception($"type:'{hostType.FullName}' field:'{name}' 生成的c#字段名与类型名相同，会引起编译错误");
+                throw new LubanException(hostType.Source, "error.def.field.csharp_name_conflict", hostType.FullName, name);
             }
             f.AutoId = nextAutoId++;
         }
@@ -166,11 +187,11 @@ public class DefField
             {
                 if (!aliasNames.TryAdd(f.Alias, f))
                 {
-                    throw new Exception($"type:'{hostType.FullName}' field:'{f.Name}' alias:'{f.Alias}' duplicate with field:{aliasNames[f.Alias].Name}");
+                    throw new LubanException(hostType.Source, "error.def.field.alias_duplicate_field", hostType.FullName, f.Name, f.Alias, aliasNames[f.Alias].Name);
                 }
                 if (names.Contains(f.Alias))
                 {
-                    throw new Exception($"type:'{hostType.FullName}' field:'{f.Name}' alias:'{f.Alias}' duplicate with other field name");
+                    throw new LubanException(hostType.Source, "error.def.field.alias_duplicate_name", hostType.FullName, f.Name, f.Alias);
                 }
             }
             f.Compile();

@@ -1,3 +1,24 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.RawDefs;
 using Luban.TypeVisitors;
 using Luban.Utils;
@@ -94,6 +115,7 @@ public class DefBean : DefTypeBase
         IsValueType = b.IsValueType;
         Groups = b.Groups;
         TypeMappers = b.TypeMappers is { Count: > 0 } ? b.TypeMappers : null;
+        Source = b.Source;
     }
 
     protected DefField CreateField(RawField f, int idOffset)
@@ -159,7 +181,7 @@ public class DefBean : DefTypeBase
         {
             if (!string.IsNullOrWhiteSpace(c.Alias) && !nameOrAliasName.Add(c.Alias))
             {
-                throw new Exception($"bean:'{FullName}' alias:{c.Alias} 重复");
+                throw new LubanException(Source, "error.def.bean.duplicate_alias", FullName, c.Alias);
             }
         }
         DefField.CompileFields(this, HierarchyFields);
@@ -212,7 +234,7 @@ public class DefBean : DefTypeBase
         {
             if ((ParentDefType = (DefBean)Assembly.GetDefType(Namespace, Parent)) == null)
             {
-                throw new Exception($"bean:'{FullName}' parent:'{Parent}' not exist");
+                throw new LubanException(Source, "error.def.bean.parent_not_exist", FullName, Parent);
             }
             if (ParentDefType.Children == null)
             {

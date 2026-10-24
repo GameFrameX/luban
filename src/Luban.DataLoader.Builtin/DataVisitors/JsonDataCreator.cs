@@ -1,9 +1,30 @@
-using System.Text.Json;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Defs;
 using Luban.Types;
 using Luban.TypeVisitors;
 using Luban.Utils;
+using System.Text.Json;
 
 namespace Luban.DataLoader.Builtin.DataVisitors;
 
@@ -60,7 +81,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
     {
         if (!string.IsNullOrEmpty(field.CurrentVariantNameWithFieldName))
         {
-            if ( x.TryGetProperty(field.CurrentVariantNameWithFieldName, out ele))
+            if (x.TryGetProperty(field.CurrentVariantNameWithFieldName, out ele))
             {
                 return true;
             }
@@ -85,7 +106,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
         {
             if (!x.TryGetProperty(FieldNames.JsonTypeNameKey, out var typeNameProp) && !x.TryGetProperty(FieldNames.FallbackTypeNameKey, out typeNameProp))
             {
-                throw new Exception($"结构:'{bean.FullName}' 是多态类型，必须用 '{FieldNames.JsonTypeNameKey}' 字段指定 子类名");
+                throw new LubanException("error.data.polymorphic_need_type", bean.FullName, FieldNames.JsonTypeNameKey);
             }
             string subType = typeNameProp.GetString();
             implBean = DataUtil.GetImplTypeByNameOrAlias(bean, subType);
@@ -108,7 +129,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
                     }
                     else
                     {
-                        throw new Exception($"结构:'{implBean.FullName}' 字段:'{f.Name}' 不能 null or undefined ");
+                        throw new LubanException("error.data.field_null", implBean.FullName, f.Name);
                     }
                 }
                 else
@@ -136,7 +157,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
             }
             else
             {
-                throw new Exception($"结构:'{implBean.FullName}' 字段:'{f.CurrentVariantNameWithFieldNameOrOrigin}' 缺失");
+                throw new LubanException("error.data.missing_field", implBean.FullName, f.CurrentVariantNameWithFieldNameOrOrigin);
             }
         }
         return new DBean(type, implBean, fields);
@@ -180,7 +201,7 @@ public class JsonDataCreator : ITypeFuncVisitor<JsonElement, DefAssembly, DType>
             DType value = type.ValueType.Apply(this, e[1], ass);
             if (!map.TryAdd(key, value))
             {
-                throw new Exception($"map 的 key:{key} 重复");
+                throw new LubanException("error.data.map_duplicate_key", key);
             }
         }
         return new DMap(type, map);

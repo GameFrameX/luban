@@ -1,8 +1,27 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using Luban.CodeTarget;
 using Luban.DataLoader;
 using Luban.DataTarget;
 using Luban.Defs;
-using Luban.L10N;
 using Luban.OutputSaver;
 using Luban.PostProcess;
 using Luban.RawDefs;
@@ -47,6 +66,7 @@ public class DefaultPipeline : IPipeline
         string schemaCollectorName = _args.SchemaCollector;
         s_logger.Info("load schema. collector: {}", schemaCollectorName);
         var schemaCollector = SchemaManager.Ins.CreateSchemaCollector(schemaCollectorName);
+        schemaCollector.SetVariants(_args.Variants);
         schemaCollector.Load(_config);
         _rawAssembly = schemaCollector.CreateRawAssembly();
     }
@@ -164,15 +184,15 @@ public class DefaultPipeline : IPipeline
     protected void ProcessTargets()
     {
         var tasks = new List<Task>();
-        tasks.Add(Task.Run(() =>
+        foreach (string target in _args.CodeTargets)
         {
-            foreach (string target in _args.CodeTargets)
+            string codeTargetName = target;
+            tasks.Add(Task.Run(() =>
             {
-                // code target doesn't support run in parallel
-                ICodeTarget m = CodeTargetManager.Ins.CreateCodeTarget(target);
-                ProcessCodeTarget(target, m);
-            }
-        }));
+                ICodeTarget m = CodeTargetManager.Ins.CreateCodeTarget(codeTargetName);
+                ProcessCodeTarget(codeTargetName, m);
+            }));
+        }
 
         if (_args.ForceLoadTableDatas || _args.DataTargets.Count > 0)
         {

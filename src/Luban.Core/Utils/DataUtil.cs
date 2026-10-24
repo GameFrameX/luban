@@ -1,7 +1,28 @@
-using System.Text;
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+using Luban.Diagnostics;
 using Luban.Datas;
 using Luban.Defs;
 using Luban.Types;
+using System.Text;
 
 namespace Luban.Utils;
 
@@ -19,7 +40,7 @@ public static class DataUtil
             case "0":
                 return false;
             default:
-                throw new Exception($"{s} 不是 bool 类型的值 (true|1 或 false|0)");
+                throw new LubanException("error.data.invalid_bool", s);
         }
     }
 
@@ -45,6 +66,31 @@ public static class DataUtil
         stream.Seek(0, SeekOrigin.Begin);
         stream.ReadExactly(bytes, 0, bytes.Length);
         return bytes;
+    }
+
+    public static string RemoveStringQuote(string s)
+    {
+        if (s.Length == 0)
+        {
+            return s;
+        }
+        if (s[0] == '\'')
+        {
+            if (s.Length == 1 || s[s.Length - 1] != '\'')
+            {
+                throw new LubanException("error.data.bad_string", s);
+            }
+            return s.Substring(1, s.Length - 2);
+        }
+        else if (s[0] == '\"')
+        {
+            if (s.Length == 1 || s[s.Length - 1] != '\"')
+            {
+                throw new LubanException("error.data.bad_string", s);
+            }
+            return s.Substring(1, s.Length - 2);
+        }
+        return s;
     }
 
     public static string UnEscapeRawString(string s)
@@ -99,7 +145,7 @@ public static class DataUtil
             result.Append(']').Append(multiEqualStr).Append(']');
             return result.ToString();
         }
-        throw new Exception($"too complex string:'{s}'");
+        throw new LubanException("error.data.too_complex_string", s);
     }
 
     //public static string EscapeStringWithQuote(string s)
@@ -170,16 +216,16 @@ public static class DataUtil
     {
         if (string.IsNullOrEmpty(subType))
         {
-            throw new Exception($"module:'{bean.Namespace}' 多态数据type不能为空");
+            throw new LubanException("error.data.polymorphic_type_empty", bean.Namespace);
         }
         DefBean defType = bean.GetHierarchyChildren().FirstOrDefault(c => c.Alias == subType || c.Name == subType || c.FullName == subType);
         if (defType == null)
         {
-            throw new Exception($"module:'{bean.Namespace}' type:'{subType}' 不是合法类型");
+            throw new LubanException("error.data.polymorphic_type_invalid", bean.Namespace, subType);
         }
         if (defType.IsAbstractType)
         {
-            throw new Exception($"module:'{bean.Namespace}' type:'{subType}' 是抽象类. 不能创建实例");
+            throw new LubanException("error.data.polymorphic_type_abstract", bean.Namespace, subType);
         }
         return defType;
     }

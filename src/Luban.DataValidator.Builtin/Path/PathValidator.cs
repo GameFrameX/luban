@@ -1,5 +1,26 @@
+// Copyright 2025 Code Philosophy
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 using Luban.Datas;
 using Luban.Defs;
+using Luban.Diagnostics;
 using Luban.Types;
 using Luban.Utils;
 using Luban.Validator;
@@ -24,7 +45,7 @@ public class PathValidator : DataValidatorBase
             string key = $"{BuiltinOptionNames.PathValidatorFamily}.{BuiltinOptionNames.PathValidatorRootDir}";
             if (GenerationContext.Current.GetOrAddUniqueObject(key, () => this) == this)
             {
-                s_logger.Warn("option '-x {0}=<rootValidationDir>' not found, path validation is disabled", key);
+                s_logger.Warn(MessageCatalog.Format("warn.validator.path.disabled", key));
             }
         }
     }
@@ -87,6 +108,15 @@ public class PathValidator : DataValidatorBase
                 _pathPattern = new Ue4ResourcePattern();
                 break;
             }
+            case "godot":
+            {
+                if (ss.Length != 1)
+                {
+                    ThrowCompileError(field, "");
+                }
+                _pathPattern = new GodotResourcePattern();
+                break;
+            }
             default:
             {
                 ThrowCompileError(field, $"不支持的path模式类型:{patType}");
@@ -112,7 +142,7 @@ public class PathValidator : DataValidatorBase
 
         if (!_pathPattern.ExistPath(_rootDir, value))
         {
-            s_logger.Error("{}:{} (来自文件:{}) 找不到对应文件", RecordPath, value, Source);
+            s_logger.Error(MessageCatalog.Format("error.validator.path.not_found", RecordPath, value, Source));
             GenerationContext.Current.LogValidatorFail(this);
         }
     }
