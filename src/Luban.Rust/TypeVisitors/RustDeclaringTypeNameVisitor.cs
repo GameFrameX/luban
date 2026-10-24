@@ -83,7 +83,7 @@ public class RustDeclaringTypeNameVisitor : ITypeFuncVisitor<string>
     {
         return type.DefBean.IsAbstractType
             ? "std::sync::Arc<AbstractBase>"
-            : $"crate::{(type.DefBean.TypeNameWithTypeMapper() ?? type.DefBean.FullName).Replace(".", "::")}";
+            : type.DefBean.TypeNameWithTypeMapper() ?? RustCommonTemplateExtension.FullName(type.DefBean);
     }
 
     public virtual string Accept(TArray type)
