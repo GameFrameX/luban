@@ -160,9 +160,9 @@ jobs:
         if: steps.release.outputs.need_release == 'true'
         run: |
           mkdir -p dist
-          dotnet publish src/Luban/Luban.csproj --configuration Release --output dist/Luban /p:UseAppHost=false
-          dotnet publish src/Luban.Agent/Luban.Agent.csproj --configuration Release --output dist/Luban.Agent /p:UseAppHost=false
-          dotnet publish src/Luban.Mcp/Luban.Mcp.csproj --configuration Release --output dist/Luban.Mcp /p:UseAppHost=false
+          dotnet publish src/Luban/Luban.csproj --configuration Release --output dist/Luban /p:UseAppHost=false /p:Version=${{ steps.release.outputs.version }}
+          dotnet publish src/Luban.Agent/Luban.Agent.csproj --configuration Release --output dist/Luban.Agent /p:UseAppHost=false /p:Version=${{ steps.release.outputs.version }}
+          dotnet publish src/Luban.Mcp/Luban.Mcp.csproj --configuration Release --output dist/Luban.Mcp /p:UseAppHost=false /p:Version=${{ steps.release.outputs.version }}
           for project in Luban Luban.Agent Luban.Mcp; do
             tar -czf "gameframex-luban-${{ steps.release.outputs.version }}-${project}.tar.gz" -C dist "${project}"
           done
