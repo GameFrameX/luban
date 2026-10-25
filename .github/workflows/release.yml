@@ -156,6 +156,17 @@ jobs:
         if: steps.release.outputs.need_release == 'true'
         run: dotnet build src/Luban.sln --configuration Release
 
+      - name: Publish release artifacts
+        if: steps.release.outputs.need_release == 'true'
+        run: |
+          mkdir -p dist
+          dotnet publish src/Luban/Luban.csproj --configuration Release --output dist/Luban /p:UseAppHost=false
+          dotnet publish src/Luban.Agent/Luban.Agent.csproj --configuration Release --output dist/Luban.Agent /p:UseAppHost=false
+          dotnet publish src/Luban.Mcp/Luban.Mcp.csproj --configuration Release --output dist/Luban.Mcp /p:UseAppHost=false
+          for project in Luban Luban.Agent Luban.Mcp; do
+            tar -czf "gameframex-luban-${{ steps.release.outputs.version }}-${project}.tar.gz" -C dist "${project}"
+          done
+
       - name: Normalize image owner
         if: steps.release.outputs.need_release == 'true'
         id: image
@@ -273,5 +284,9 @@ jobs:
         with:
           tag_name: ${{ steps.release.outputs.version }}
           body: ${{ steps.release_notes.outputs.changelog }}
+          files: |
+            gameframex-luban-${{ steps.release.outputs.version }}-Luban.tar.gz
+            gameframex-luban-${{ steps.release.outputs.version }}-Luban.Agent.tar.gz
+            gameframex-luban-${{ steps.release.outputs.version }}-Luban.Mcp.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
