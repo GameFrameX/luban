@@ -1,89 +1,101 @@
+<div align="center">
+
+<img src="https://download.alianblank.com/gameframex/gameframex_logo_320.png" alt="Game Frame X Logo" width="160" />
+
 # Luban
 
-![icon](docs/images/logo.png)
+[![License](https://img.shields.io/badge/license-blue.svg)](LICENSE.md)
+[![Version](https://img.shields.io/github/v/release/GameFrameX/luban)](https://github.com/GameFrameX/luban/releases)
+[![Documentation](https://img.shields.io/badge/Documentation-blue.svg)](https://gameframex.doc.alianblank.com)
 
-[![license](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://opensource.org/licenses/MIT) ![star](https://img.shields.io/github/stars/focus-creative-games/luban?style=flat-square) ![release](https://img.shields.io/github/v/release/GameFrameX/luban?style=flat-square)
+[![Discord](https://img.shields.io/badge/-5865F2?logo=discord&logoColor=white)](https://discord.gg/VDWUjWMDw9)
+[![GitHub](https://img.shields.io/badge/-181717?logo=github&logoColor=white)](https://github.com/GameFrameX/gameframex)
+[![Bilibili](https://img.shields.io/badge/-00A1D6?logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV1yrpeepEn7)
+[![Gitee](https://img.shields.io/badge/-C71D23?logo=gitee&logoColor=white)](https://gitee.com/GameFrameX/gameframex)
 
-**中文** | [English](./README_EN.md)
+All-in-One Solution for Indie Game Development · Empowering Indie Developers' Dreams
 
-luban是一个强大、易用、优雅、稳定的游戏配置解决方案。它设计目标为满足从小型到超大型游戏项目的简单到复杂的游戏配置工作流需求。
+<br />
 
-luban可以处理丰富的文件类型，支持主流的语言，可以生成多种导出格式，支持丰富的数据检验功能，具有良好的跨平台能力，并且生成极快。
-luban有清晰优雅的生成管线设计，支持良好的模块化和插件化，方便开发者进行二次开发。开发者很容易就能将luban适配到自己的配置格式，定制出满足项目要求的强大的配置工具。
+[Documentation](https://gameframex.doc.alianblank.com) · [Quick Start](#quick-start) · QQ Group: 467608841 / 233840761
 
-luban标准化了游戏配置开发工作流，可以极大提升策划和程序的工作效率。
+<br />
 
-自 **5.0.0** 起，Luban 面向 AI Agent / IDE 提供 **AI Native** 能力：官方 Skills、机器可读 schema 与报错、`Luban.Agent` CLI，以及 MCP Server，让加表、查 schema、校验与生成可以稳定地交给 Agent 完成。
+**English** \| [简体中文](README.zh-CN.md) \| [繁體中文](README.zh-TW.md) \| [日本語](README.ja.md) \| [한국어](README.ko.md)
 
-## 核心特性
+</div>
 
-- 丰富的源数据格式。支持excel族(csv,tsv,xls,xlsx,xlsm)、json、xml、yaml、lua等
-- 丰富的导出格式。 支持生成binary、json、bson、xml、lua、yaml等格式数据
-- 增强的excel格式。可以简洁地配置出像简单列表、子结构、结构列表，以及任意复杂的深层次的嵌套结构
-- 完备的类型系统。不仅能表达常见的规范行列表，由于**支持OOP类型继承**，能灵活优雅表达行为树、技能、剧情、副本之类复杂GamePlay数据
-- 支持多种的语言。内置支持生成c#、java、go、cpp、lua、python、javascript、typescript、rust、php、erlang、godot 等语言代码，同时还能通过protobuf之类消息方案支持其他语言
-- 支持主流的消息方案。 protobuf(schema + binary + json)、flatbuffers(schema + json)、msgpack(binary)
-- 强大的数据校验能力。ref引用检查、path资源路径、range范围检查等等
-- 完善的本地化支持
-- **AI Native（5.0.0+）**。官方 Agent Skills、`-c schema-json`、`--errorFormat json`、`Luban.Agent`（校验 / 查表 / describe）、`Luban.Mcp`（IDE 工具调用）
-- 支持所有主流的游戏引擎和平台。支持Unity、Unreal、Cocos2x、Godot、微信小游戏等
-- 良好的跨平台能力。能在Win,Linux,Mac平台良好运行。
-- 支持所有主流的热更新方案。hybridclr、ilruntime、{x,t,s}lua、puerts等
-- 生成的代码未调用任何反射接口，兼容[Obfuz](https://github.com/focus-creative-games/obfuz)、Obfuscator、Confuser、.Net Refactor等常见代码混淆和加固工具。
-- 清晰优雅的生成管线，很容易在luban基础上进行二次开发，定制出适合自己项目风格的配置工具。
+## Project Overview
 
-## GameFrameX 分支说明
+luban is a powerful, easy-to-use, elegant, and stable game configuration solution. It is designed to meet the needs of simple to complex game configuration workflows from small to very large game projects.
 
-本仓库是 [focus-creative-games/luban](https://github.com/focus-creative-games/luban) 的 GameFrameX 分支，已合并官方 **v5.1.0**：吸收官方 v4 / v5 的基座重构与 AI 能力，同时保留下列 GameFrameX 功能与修复。分支相关问题请提交到 [GameFrameX/luban Issues](https://github.com/GameFrameX/luban/issues)。
+luban can handle a variety of file types, supports popular languages, can generate multiple export formats, supports rich data inspection functions, has good cross-platform capabilities, and generates extremely fast.
 
-### 与官方版本的功能差异
+Luban has a clear and elegant generation pipeline design, supports good modularization and plug-in, and is convenient for developers to carry out secondary development. Developers can easily adapt luban to their own configuration format, and customize powerful configuration tools that meet project requirements.
 
-| 功能 | 说明 |
-|:-----|:-----|
-| split 代码生成目标 | 原目标名追加 `-split`，定义与运行时代码分文件输出，见[说明](#增加-split-代码生成目标) |
-| `cs-litjson` / `cs-litjson-split` | 基于 GameFrameX LitJson 的 C# 代码生成目标，见[说明](#增加-cs-litjson--cs-litjson-split-代码生成目标) |
-| C# 运行时形态 | `cs-bin`、`cs-dotnet-bin`、`cs-dotnet-json`、`cs-simple-json`、`cs-litjson` 及其 `-split` 变体生成 GameFrameX 运行时形态：表类继承 `BaseDataTable<T>`，`Tables.Init(ConfigComponent)` 后通过 `LoadAsync` 异步加载；`cs-code`、`cs-editor-json`、`cs-newtonsoft-json` 不使用该形态 |
-| 文件名自动导表 | `tableImporter.name=gameframex`，按文件名与目录推导表名、分组与命名空间，见[说明](#增加自动导表的文件名称扩展识别) |
-| 导表排除目录 | `--excludePath`，见[说明](#增加导表排除目录参数---excludepath) |
-| 本地化文件夹 | `l10n.provider=gameframex`，`l10n.textFile.path` 支持多个文件夹，见[说明](#增加本地化的文件夹配置支持) |
-| text 内联本地化 | `l10n.inline.*`，见[说明](#支持-text-内联本地化) |
-| 枚举自动收集 | `auto_extend`，见[说明](#增加枚举自动收集autoextend能力) |
-| 同名 `--xargs` 多值 | 同名参数可重复出现，列表语义的参数按出现顺序取全部值 |
-| 目标框架 | 统一为 `net10.0`（官方为 `net8.0`） |
-| `Luban.GUI` | 基于 Avalonia 的桌面导表工具（`src/Luban.GUI`） |
-| Docker 镜像 | 见 [Docker](#docker) |
+Luban standardizes the game configuration development workflow, which can greatly improve the efficiency of planning and programming.
 
-### 自定义修复在合并 v5.1.0 后的状态
+Since **5.0.0**, Luban is **AI Native** for AI Agents / IDEs: official Skills, machine-readable schema and diagnostics, `Luban.Agent` CLI, and an MCP Server—so agents can reliably add tables, inspect schema, validate, and generate.
 
-| 修复 | 原提交 | 合并后状态 |
-|:-----|:-------|:-----------|
-| l10n：`TranslateText` 按继承关系生成 `virtual` / `override` | `24774645` | 保留 |
-| l10n：内联本地化 xlsx 增量合并、无变化时不重写、源语言 value 变化时同步 | `a8fd260c`、`b2a3e7b7`、`421349aa` | 保留 |
-| cs-dotnet-json：表类自持 `_loadFunc`，不再链基类 JSON 构造 | `e1f39884` | 保留 |
-| cs-dotnet-json：非空 ref 字段取值改用 `TryGet` | `27b318b8` | 保留 |
-| cs-dotnet-bin：list / one 表 `LoadAsync` 补 `override`；map 表重载前清空 `LongDataMaps` | `ff138c33` | 保留 |
-| cs-bin-split：`bean.def` 模板移除多余的 `using SimpleJSON` | `95b08b0b` | 保留 |
-| table 模板 list / one 模式生成重复字段与构造函数 | `92aea61d` | 保留 |
-| 读取字节使用 `ReadExactly` 避免短读 | `1e2333f3` | 保留 |
-| 整型字段支持 `0x` 十六进制字面量 | `dd520088` | 由官方实现取代（官方 `42e5a380`，`LoadDataUtil.TryParseExcelIntFromNumberOrConstAlias`） |
-| `map<int, _>` 的 key 支持 `0x` 十六进制字面量 | `a93ab40f` | 保留（官方未覆盖 map key 解析路径） |
-| Bean 全名与字段同名时编译错误、`[*items,,,*items]` 多行标记、末列合并单元格越界 | `368c5344`、`d5cff3d4`、`d6c7a87c`、`534dd6c0` | 官方已有等价修复，以官方实现为准 |
+### GameFrameX Fork Notes
 
-## AI 支持
+This repository is the GameFrameX fork of [focus-creative-games/luban](https://github.com/focus-creative-games/luban). It has merged upstream **v5.1.0**, taking in the v4 / v5 core refactoring and AI capabilities while keeping the GameFrameX features and fixes listed below. Please report fork-specific issues at [GameFrameX/luban Issues](https://github.com/GameFrameX/luban/issues).
 
-官方 v5 的 AI Native 能力已随 v5.1.0 合入本分支：
+#### Differences from upstream
 
-| 能力 | 入口 | 用途 |
-|:-----|:-----|:-----|
-| Agent Skills | [`ai/skills/`](./ai/skills) | 加表、填表、schema 设计、校验器、生成排错、运行时加载 6 个技能 |
-| schema-json | `-c schema-json` | 输出机器可读的 `schema.json` |
-| JSON 诊断 | `--errorFormat json` | 失败时向 stderr 输出结构化 JSON 诊断 |
-| Luban.Agent | [`src/Luban.Agent`](./src/Luban.Agent/README.md) | `capabilities` / `list-tables` / `describe` / `schema` / `validate`，stdout 输出单个 JSON 结果 |
-| Luban.Mcp | [`src/Luban.Mcp`](./src/Luban.Mcp/README.md) | stdio MCP Server，供 IDE / Agent 调用 |
+| Feature | Description |
+|:--------|:------------|
+| Split code targets | Original target name plus `-split`; definitions and runtime code are emitted into separate files, see [details](#split-code-generation-targets) |
+| `cs-litjson` / `cs-litjson-split` | C# code targets based on GameFrameX LitJson, see [details](#cs-litjson--cs-litjson-split-code-generation-targets) |
+| C# runtime shape | `cs-bin`, `cs-dotnet-bin`, `cs-dotnet-json`, `cs-simple-json`, `cs-litjson` and their `-split` variants generate the GameFrameX runtime shape: table classes inherit `BaseDataTable<T>`, and data loads asynchronously via `LoadAsync` after `Tables.Init(ConfigComponent)`; `cs-code`, `cs-editor-json`, and `cs-newtonsoft-json` do not use this shape |
+| File-name based table import | `tableImporter.name=gameframex` derives table name, group, and namespace from file names and directories, see [details](#file-name-based-automatic-table-import) |
+| Excluded import directories | `--excludePath`, see [details](#exclude-directories-from-import---excludepath) |
+| Localization folders | `l10n.provider=gameframex`; `l10n.textFile.path` accepts multiple folders, see [details](#localization-folder-configuration) |
+| Inline text localization | `l10n.inline.*`, see [details](#inline-localization-for-text-fields) |
+| Enum auto collection | `auto_extend`, see [details](#enum-auto-collection-autoextend) |
+| Repeated `--xargs` | Options with the same name may repeat; list-semantic options take every value in order |
+| Target framework | `net10.0` everywhere (upstream uses `net8.0`) |
+| `Luban.GUI` | Avalonia desktop export tool (`src/Luban.GUI`) |
+| Docker image | See [Docker](#docker) |
 
-### 构建
+#### Status of custom fixes after merging v5.1.0
 
-本分支的 AI 工具以三个独立输出目录发布（Docker 镜像只包含主程序 `Luban`）：
+| Fix | Original commit | Status after merge |
+|:----|:----------------|:-------------------|
+| l10n: `TranslateText` emits `virtual` / `override` by inheritance | `24774645` | Kept |
+| l10n: inline localization xlsx merges incrementally, skips rewriting when unchanged, syncs source-language values | `a8fd260c`, `b2a3e7b7`, `421349aa` | Kept |
+| cs-dotnet-json: table class owns `_loadFunc` instead of chaining the base JSON constructor | `e1f39884` | Kept |
+| cs-dotnet-json: non-nullable ref fields resolve via `TryGet` | `27b318b8` | Kept |
+| cs-dotnet-bin: `override` on list / one table `LoadAsync`; map tables clear `LongDataMaps` before reload | `ff138c33` | Kept |
+| cs-bin-split: drop the redundant `using SimpleJSON` from the `bean.def` template | `95b08b0b` | Kept |
+| Table template list / one mode generating duplicate fields and constructors | `92aea61d` | Kept |
+| Read bytes with `ReadExactly` to avoid short reads | `1e2333f3` | Kept |
+| `0x` hexadecimal literals in integer fields | `dd520088` | Superseded by upstream (`42e5a380`, `LoadDataUtil.TryParseExcelIntFromNumberOrConstAlias`) |
+| `0x` hexadecimal literals in `map<int, _>` keys | `a93ab40f` | Kept (upstream does not cover the map key parsing path) |
+| Compile error when a bean full name equals a field name, `[*items,,,*items]` multi-row markers, out-of-range merged last header column | `368c5344`, `d5cff3d4`, `d6c7a87c`, `534dd6c0` | Equivalent upstream fixes exist; upstream implementation wins |
+
+### Features
+
+- Rich source data format. Support excel family (csv, tsv, xls, xlsx, xlsm), json, xml, yaml, lua, etc.
+- Rich export formats. Support generating binary, json, bson, xml, lua, yaml and other format data
+- Enhanced excel format. Simple configurations such as simple lists, substructures, structured lists, and arbitrarily complex deep nested structures can be concisely configured
+- Complete type system. Not only can it express common specification line lists, but it can flexibly and elegantly express complex GamePlay data such as behavior trees, skills, plots, and dungeons because **supports OOP type inheritance**
+- Support multiple languages. Supports generating language codes such as c#, java, go, cpp, lua, python, javascript, typescript, php, rust, godot, etc.
+- Support popular message schemes. protobuf(schema + binary + json), flatbuffers(schema + json), msgpack(binary)
+- Powerful data verification capability. ref reference check, path resource path, range range check, etc.
+- Perfect localization support
+- **AI Native (5.0.0+)**. Official Agent Skills, `-c schema-json`, `--errorFormat json`, `Luban.Agent` (validate / list / describe), and `Luban.Mcp` (IDE tool calling)
+- Supports all major game engines and platforms. Support Unity, Unreal, Cocos2x, Godot, WeChat games, etc.
+- Good cross-platform capability. It can run well on Win, Linux, and Mac platforms
+- Support all mainstream hot update solutions. hybridclr, ilruntime, {x,t,s}lua, puerts, etc.
+- The generated code makes no reflection API calls, ensuring compatibility with common code obfuscation and hardening tools such as [Obfuz](https://github.com/focus-creative-games/obfuz), Obfuscator, Confuser, and .NET Refactor.
+- Clear and elegant generation pipeline, it is easy to carry out secondary development on the basis of luban, and customize a configuration tool suitable for your own project style.
+
+## Quick Start
+
+### Installation
+
+Build from source (this fork ships the AI tools as three separate output directories):
 
 ```bash
 dotnet build src/Luban/Luban.csproj -c Release -o <out>/Luban
@@ -91,9 +103,55 @@ dotnet build src/Luban.Agent/Luban.Agent.csproj -c Release -o <out>/Luban.Agent
 dotnet build src/Luban.Mcp/Luban.Mcp.csproj -c Release -o <out>/Luban.Mcp
 ```
 
-### 启动 MCP Server
+Or use the Docker image (contains the main `Luban` program only, without `Luban.Agent` or `Luban.Mcp`). Image tags match Git tags and use SemVer without the `v` prefix, e.g. `3.13.1`; see [Releases](https://github.com/GameFrameX/luban/releases) for available versions.
 
-在 MCP 客户端配置中注册（`mcpServers` 格式，`<out>` 换成实际输出目录）：
+| Registry | Image |
+|:---------|:------|
+| Docker Hub | `docker.io/gameframex/gameframex-luban:<version>` |
+| GitHub Container Registry | `ghcr.io/gameframex/gameframex-luban:<version>` |
+| Aliyun Container Registry | `<ALIYUN_REGISTRY_URL>/<ALIYUN_NAMESPACE>/gameframex-luban:<version>` |
+
+```bash
+docker run --rm docker.io/gameframex/gameframex-luban:<version> --help
+```
+
+Mount the working directory to run Luban in the current project directory:
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work docker.io/gameframex/gameframex-luban:<version> --help
+```
+
+Only exact version tags are published; there are no floating tags such as `latest`, `5`, or `5.1`.
+
+### Running tests
+
+In-repo xUnit integration tests (no dependency on external `luban_examples`):
+
+```bash
+dotnet test src/Luban.Tests/Luban.Tests.csproj
+```
+
+- Fixtures and expected outputs: `tests/fixtures/`, `tests/golden/`
+- Refresh goldens after export changes: `pwsh tests/scripts/update-goldens.ps1` or `bash tests/scripts/update-goldens.sh`
+- Or set `LUBAN_UPDATE_GOLDEN=1` while running tests to rewrite goldens in place
+
+## Usage Examples
+
+### AI support
+
+Upstream v5 AI Native capabilities came into this fork with v5.1.0:
+
+| Capability | Entry | Purpose |
+|:-----------|:------|:--------|
+| Agent Skills | [`ai/skills/`](./ai/skills) | Six skills: add table, fill Excel, schema design, validators, generation debugging, runtime loading |
+| schema-json | `-c schema-json` | Emits a machine-readable `schema.json` |
+| JSON diagnostics | `--errorFormat json` | Writes structured JSON diagnostics to stderr on failure |
+| Luban.Agent | [`src/Luban.Agent`](./src/Luban.Agent/README.md) | `capabilities` / `list-tables` / `describe` / `schema` / `validate`; prints a single JSON result on stdout |
+| Luban.Mcp | [`src/Luban.Mcp`](./src/Luban.Mcp/README.md) | stdio MCP server for IDEs / agents |
+
+#### Start the MCP server
+
+Register it in your MCP client configuration (`mcpServers` format; replace `<out>` with your output directory):
 
 ```json
 {
@@ -111,77 +169,77 @@ dotnet build src/Luban.Mcp/Luban.Mcp.csproj -c Release -o <out>/Luban.Mcp
 }
 ```
 
-- 必须设置 `LUBAN_AGENT_DLL` 与 `LUBAN_DLL`：未设置时 Luban.Mcp 只回退查找源码树内的 `bin/Release|Debug/net8.0`，本分支目标框架为 `net10.0`，回退路径不会命中。
-- `LUBAN_DOC` 可选，指向 luban-doc 仓库的 `docs` 目录，供 `search_docs` 使用。
-- 暴露的工具：`list_tables` / `get_schema` / `describe` / `validate` / `generate` / `search_docs`，参数见 [`src/Luban.Mcp/README.md`](./src/Luban.Mcp/README.md)。
+- `LUBAN_AGENT_DLL` and `LUBAN_DLL` are required: without them Luban.Mcp only falls back to `bin/Release|Debug/net8.0` inside the source tree, and this fork targets `net10.0`, so the fallback search path never matches.
+- `LUBAN_DOC` is optional and points to the `docs` directory of the luban-doc repository for `search_docs`.
+- Exposed tools: `list_tables` / `get_schema` / `describe` / `validate` / `generate` / `search_docs`; see [`src/Luban.Mcp/README.md`](./src/Luban.Mcp/README.md) for arguments.
 
-### 使用技能
+#### Use the skills
 
-把 `ai/skills/` 下的技能目录复制到 Agent 的技能目录（如 `.cursor/skills/`、`~/.claude/skills/`），详见 [`ai/README.md`](./ai/README.md)。
+Copy the skill directories under `ai/skills/` into your agent's skill directory (e.g. `.cursor/skills/`, `~/.claude/skills/`). See [`ai/README.md`](./ai/README.md).
 
-### 命令行
+#### Command line
 
 ```bash
-# 导出机器可读 schema（schema.json 输出到 outputCodeDir）
+# Export the machine-readable schema (schema.json goes to outputCodeDir)
 dotnet <out>/Luban/Luban.dll --conf luban.conf -t all -c schema-json -d json -x outputCodeDir=<codeDir> -x outputDataDir=<dataDir>
 
-# 失败时以 JSON 输出诊断（写入 stderr）
+# Print diagnostics as JSON on failure (written to stderr)
 dotnet <out>/Luban/Luban.dll --conf luban.conf -t all -d json --errorFormat json -x outputDataDir=<dataDir>
 
-# 只校验、不输出文件
+# Validate only, no file output
 dotnet <out>/Luban.Agent/Luban.Agent.dll validate --conf luban.conf -t all
 ```
 
-文档：[AI 支持总览](https://www.datable.cn/docs/ai/overview) · [Skills](https://www.datable.cn/docs/ai/skills) · [Agent CLI](https://www.datable.cn/docs/ai/agent-cli) · [MCP](https://www.datable.cn/docs/ai/mcp) · [schema-json](https://www.datable.cn/docs/ai/schema-json)
+Docs: [AI overview](https://www.datable.cn/en/docs/ai/overview) · [Skills](https://www.datable.cn/en/docs/ai/skills) · [Agent CLI](https://www.datable.cn/en/docs/ai/agent-cli) · [MCP](https://www.datable.cn/en/docs/ai/mcp) · [schema-json](https://www.datable.cn/en/docs/ai/schema-json)
 
-## 修改和增加
+### Changes and additions
 
-### 增加 split 代码生成目标
+#### Split code generation targets
 
-在不破坏原有代码生成目标的前提下，新增一组以原目标名称追加 `-split` 后缀的代码生成目标。
+A set of split code generation targets is added without touching the original ones — each new target is the original target name plus a `-split` suffix.
 
-split 目标用于将生成代码拆分为更细粒度的文件：定义信息输出到面向阅读、审查和 AI 上下文使用的 Def 文件中，解析、加载和运行时代码保留在 Impl 或运行时文件中。这样在只关注单个配置类型时，可以读取对应的 Def 文件，而不需要读取完整的全量 schema 文件。
+Split targets break the generated code into finer-grained files: definition information goes into Def files designed for reading, review, and AI context, while parsing, loading, and other runtime code stays in Impl or runtime files. When you only care about a single config type, read its Def file instead of the full schema file.
 
-#### 使用场景
+##### When to use
 
-- **AI 辅助开发**：把 Def 文件作为 AI 上下文提供给模型，只含字段与类型定义、不含反序列化实现，token 占用小、信噪比高。
-- **代码审查与日常查阅**：只想确认某个配置表的字段含义时，直接打开对应的 Def 文件，不必在几千行的全量 schema 文件里定位。
-- **降低合并冲突**：schema 调整集中在 Def 文件，与运行时代码的改动互不干扰，diff 更聚焦。
-- **无侵入共存**：原有非 split 目标行为完全不变，两种目标可按导出 target 分别选择。
+- **AI-assisted development**: feed Def files to the model as context — they contain only field and type definitions without deserialization code, so they are small and have a high signal-to-noise ratio.
+- **Code review and daily lookup**: open the Def file of a table to check its fields instead of locating it inside a thousands-of-lines full schema file.
+- **Fewer merge conflicts**: schema changes concentrate in Def files and no longer interleave with runtime code changes, keeping diffs focused.
+- **Non-invasive coexistence**: original non-split targets are unchanged; both kinds can be selected per export target.
 
-#### 使用方式
+##### How to use
 
-目标命名规则为「原代码生成目标 + `-split`」，把导出命令中的 `--codeTarget` 换成对应 split 目标即可，其余参数不变：
+The target naming rule is `original code target + -split`. Switch `--codeTarget` in your export command to the split variant and keep everything else unchanged:
 
 ```text
 dotnet Luban.dll --target client --dataTarget bin --codeTarget cs-bin-split --xargs outputDataDir=./Output/Data --xargs outputCodeDir=./Output/Code --conf ./luban.conf
 ```
 
-Go 语言的 split 目标需要额外指定模块名：
+Go split targets additionally require a module name:
 
 ```text
 --xargs lubanGoModule=github.com/gameframex/config
 ```
 
-各语言 split 输出的文件命名（以 `Tables` 命名空间下的 `ItemConfig` 表为例）：
+Split output file naming per language (example: table `ItemConfig` under namespace `Tables`):
 
-| 语言 | 定义文件（Def） | 运行时文件（Impl） |
-|:-----|:---------------|:------------------|
-| C# | `Tables/ItemConfig.Def.cs` | `Tables/ItemConfig.Impl.cs`（不再生成合并的 `ItemConfig.cs`） |
+| Language | Definition files (Def) | Runtime files (Impl) |
+|:---------|:-----------------------|:---------------------|
+| C# | `Tables/ItemConfig.Def.cs` | `Tables/ItemConfig.Impl.cs` (no merged `ItemConfig.cs` anymore) |
 | Go | `Tables.ItemConfig.def.go` | `Tables.ItemConfig.impl.go` |
-| Rust | `cfg/src/Tables.ItemConfig.Def.rs`、`Tables.TbItemConfig.Def.rs`、`Tables.Def.rs` | `cfg/src/tables.rs`、`cfg/src/lib.rs` |
-| C++ | `Tables.ItemConfig.Def.h` | `schema.h`、`Tables.ItemConfig.Impl.cpp` |
-| Java | `Tables/ItemConfigDef.java`（定义伴生类） | `Tables/ItemConfig.java` |
-| TypeScript | `Tables.ItemConfig.def.ts`、`Tables.def.ts` | `schema.ts` |
-| Lua | `Tables.ItemConfig.def.lua` | 运行时 schema 文件 |
-| PHP / GDScript | `Tables.ItemConfig.def.php` / `Tables.ItemConfig.def.gd` | 运行时 schema 文件 |
+| Rust | `cfg/src/Tables.ItemConfig.Def.rs`, `Tables.TbItemConfig.Def.rs`, `Tables.Def.rs` | `cfg/src/tables.rs`, `cfg/src/lib.rs` |
+| C++ | `Tables.ItemConfig.Def.h` | `schema.h`, `Tables.ItemConfig.Impl.cpp` |
+| Java | `Tables/ItemConfigDef.java` (companion definition class) | `Tables/ItemConfig.java` |
+| TypeScript | `Tables.ItemConfig.def.ts`, `Tables.def.ts` | `schema.ts` |
+| Lua | `Tables.ItemConfig.def.lua` | runtime schema file |
+| PHP / GDScript | `Tables.ItemConfig.def.php` / `Tables.ItemConfig.def.gd` | runtime schema file |
 
-Def 文件只包含定义信息（字段、类型、常量声明），不含反序列化、构造、加载等运行时代码；该约束由验收脚本断言保证。
+Def files contain definition information only (fields, types, constant declarations) — no deserialization, construction, or loading code; this constraint is asserted by the acceptance script.
 
-已支持的 split 目标：
+Supported split targets:
 
-| 语言 | 目标 |
-|:-----|:-----|
+| Language | Targets |
+|:---------|:--------|
 | C# | `cs-simple-json-split`, `cs-litjson-split`, `cs-bin-split`, `cs-dotnet-json-split`, `cs-dotnet-bin-split` |
 | Go | `go-json-split`, `go-bin-split` |
 | Rust | `rust-json-split`, `rust-bin-split` |
@@ -193,64 +251,59 @@ Def 文件只包含定义信息（字段、类型、常量声明），不含反�
 | PHP | `php-json-split` |
 | GDScript | `gdscript-json-split` |
 
-拆分规则按语言能力保持一致语义：
+The split rules keep consistent semantics across languages:
 
-- C#、Go、C++ 输出 Def/Impl 风格文件，便于区分定义上下文和运行时实现。
-- Java 由于不支持跨文件拆分同一个 public class，输出运行时类和 `XxxDef` 定义伴生类。
-- TypeScript、Python、Lua、PHP、GDScript 保留运行时 schema 文件，同时额外输出每个类型对应的 `*.def.*` 定义文件。
+- C#, Go, and C++ emit Def/Impl style files to separate definition context from runtime implementation.
+- Java cannot split one public class across files, so it emits the runtime class plus an `XxxDef` companion definition class.
+- TypeScript, Python, Lua, PHP, and GDScript keep the runtime schema file and additionally emit one `*.def.*` definition file per type.
 
-本地验收脚本：
+Local acceptance script:
 
 ```
 BASE=/tmp/luban-split-code-targets-acceptance scripts/accept-split-code-targets.sh
 ```
 
-### 增加 cs-litjson / cs-litjson-split 代码生成目标
+#### cs-litjson / cs-litjson-split code generation targets
 
-在保留 `cs-simple-json` / `cs-simple-json-split`（继续输出基于 SimpleJSON 的代码）不变的前提下，新增 `cs-litjson` 与 `cs-litjson-split` 两个独立的 C# 代码生成目标，输出基于 GameFrameX LitJson 包（命名空间 `GameFrameX.LitJSON.Runtime`，主类 `JsonData` / `JsonMapper`）的反序列化代码。向后兼容，原有 `cs-simple-json` 系列目标行为不变，按运行时已引入的 JSON 库选择对应目标即可。
+Two additional C# code generation targets, `cs-litjson` and `cs-litjson-split`, are added while `cs-simple-json` / `cs-simple-json-split` (which keep emitting SimpleJSON-based code) remain unchanged. The new targets emit deserialization code based on the GameFrameX LitJson package (namespace `GameFrameX.LitJSON.Runtime`, main classes `JsonData` / `JsonMapper`). Fully backward compatible — pick the target matching the JSON library already present in your runtime.
 
-| 目标 | 对应的原目标 | 运行时依赖 | 输出形式 |
-|:-----|:------------|:----------|:---------|
-| `cs-litjson` | `cs-simple-json` | `GameFrameX.LitJSON.Runtime` | 单文件，定义与运行时代码合并输出 |
-| `cs-litjson-split` | `cs-simple-json-split` | `GameFrameX.LitJSON.Runtime` | split 输出，定义信息在 Def 文件，运行时代码在 Impl 文件 |
+| Target | Original counterpart | Runtime dependency | Output |
+|:-------|:---------------------|:-------------------|:-------|
+| `cs-litjson` | `cs-simple-json` | `GameFrameX.LitJSON.Runtime` | single file, definition and runtime code merged |
+| `cs-litjson-split` | `cs-simple-json-split` | `GameFrameX.LitJSON.Runtime` | split output, definitions in Def files, runtime code in Impl files |
 
-#### 使用场景
+##### When to use
 
-- 运行时（尤其是 Unity 热更新层）已统一使用 GameFrameX LitJson 作为 JSON 库，希望配置加载与项目其余部分共用同一套 JSON 依赖，不再同时引入 SimpleJSON。
-- 需要 split 粒度（定义 / 运行时分离）且使用 LitJson 反序列化的 C# 工程。
+- Your runtime (especially Unity hot-update layers) already standardizes on GameFrameX LitJson, and you want config loading to share that dependency instead of pulling in SimpleJSON as well.
+- C# projects that want split granularity (definition / runtime separation) with LitJson deserialization.
 
-#### 使用方式
+##### How to use
 
 ```text
---codeTarget cs-litjson        # 单文件输出，定义与运行时合并
---codeTarget cs-litjson-split  # Def / Impl 分离输出
+--codeTarget cs-litjson        # single merged file
+--codeTarget cs-litjson-split  # Def / Impl separated output
 ```
 
-前提：运行时工程已引入 GameFrameX LitJson 包（命名空间 `GameFrameX.LitJSON.Runtime`，主类 `JsonData` / `JsonMapper`）。生成代码只依赖该包，不依赖 SimpleJSON；与 `cs-simple-json` 系列目标互不影响，可按导出 target 分别选择。`cs-litjson-split` 已包含在上文 split 目标列表的 C# 行中。
+Prerequisite: the runtime project references the GameFrameX LitJson package (namespace `GameFrameX.LitJSON.Runtime`, main classes `JsonData` / `JsonMapper`). The generated code depends only on that package, not on SimpleJSON; the targets do not affect the `cs-simple-json` family, so you can pick per export target.
 
-### 增加本地化的文件夹配置支持
+#### Localization folder configuration
 
-在项目中。经常会出现语言表在协作的时候有冲突。这个时候就需要按照每个模块来做表格文件本身的分离，已经不是Sheet的分离的问题了。所以将本地化文件夹配置支持文件夹下的所有文件都识别为本地化文件。
+In real projects, localization tables often run into conflicts during collaboration. The fix is to split the table files themselves per module — it is no longer just a matter of splitting sheets. The localization folder support makes every recognized file inside the configured folders load as a localization table.
 
-#### 示例配置
+##### Example configuration
 
-- l10n.provider=`gameframex`
+- `l10n.provider=gameframex` — required. Any other value makes localization file detection fail.
+- `l10n.textFile.path=./Excels/Tables/Localization/` — required. The value must be a folder path, otherwise localization file detection fails. The option can be repeated to specify multiple folders.
 
-这里必须为 `gameframex` 否则会导致本地化文件识别失败。
-
-- l10n.textFile.path=`./Excels/Tables/Localization/`
-
-这里值必须为 文件夹路径 否则会导致本地化文件识别失败。该参数支持重复指定多个文件夹。
-
-导出参数参考
+Export parameter reference:
 
 ```
 --xargs l10n.provider=gameframex --xargs l10n.textFile.keyFieldName=key  --xargs l10n.textFile.path=./Excels/Tables/Localization/
 ```
 
-#### 多文件夹加载（支持重复参数）
+##### Loading multiple folders (repeated options)
 
-`l10n.textFile.path` 支持重复指定多个文件夹，用于按模块拆分本地化表、避免协作冲突：
+`l10n.textFile.path` can be repeated to load multiple folders, so localization tables can be split per module to avoid collaboration conflicts:
 
 ```text
 --xargs l10n.provider=gameframex --xargs l10n.textFile.keyFieldName=key
@@ -258,25 +311,25 @@ BASE=/tmp/luban-split-code-targets-acceptance scripts/accept-split-code-targets.
 --xargs l10n.textFile.path=./Excels/Tables/LocalizationModuleB/
 ```
 
-- 同名 `--xargs` 参数可以重复出现，不再报 duplicate 错误；值按命令行出现顺序依次加载。
-- 非列表语义的其它参数以第一次出现的值为准。
-- 每个文件夹只扫描顶层文件，不递归子目录；需要加载子目录时单独再配置一行。
-- 文件夹路径不存在时记录错误日志并跳过，不影响其它文件夹的加载。
-- 不同文件中出现相同 key 时记录重复错误日志。
+- Repeated `--xargs` options with the same name no longer raise a duplicate error; values are loaded in command-line order.
+- Other non-list options take the value of their first occurrence.
+- Each folder is scanned non-recursively (top-level files only); configure sub-directories as separate entries.
+- A folder that does not exist is reported in the log and skipped; the remaining folders still load.
+- The same key appearing in different files is reported as a duplicate in the log.
 
-### 支持 text 内联本地化
+#### Inline localization for text fields
 
-普通标量 `text` 支持一列或两列写法，不需要增加特殊字段标记：
+Plain scalar `text` fields support a one-column or two-column layout without any special field markers:
 
 ```text
-字段名行：... | name |        | description |        | id
-类型行：  ... | text |        | text        |        | int
-数据行：  ... | key  | 中文值  | desc_key    | 描述值  | 1
+header row: ... | name |        | description |        | id
+type row:   ... | text |        | text        |        | int
+data row:   ... | key  | value  | desc_key    | value  | 1
 ```
 
-只有当 `text` 后一列的字段名和类型同时为空时，才将其识别为 value 列；否则 `text` 只占一列。单列 `text` 的 value 等于 key。一个表中可以有多个 `text` 字段，但只支持普通标量，不支持 `list<text>`、数组、map 或多行 text 的内联 value。
+A `text` column gets an inline value column only when both the field name and the type of the following column are empty; otherwise `text` occupies a single column and its value equals its key. A table may contain multiple `text` fields, but only plain scalars are supported — `list<text>`, arrays, maps, and multi-row text do not support inline values.
 
-显式开启后，Luban 会在业务数据加载完成后按业务表完整名称生成独立的本地化 XLSX 文件；未配置 Provider 时只生成文件，不替换业务数据中的 key：
+When explicitly enabled, Luban generates standalone localization XLSX files per business table after the business data is loaded. When no Provider is configured, it only generates the files without replacing the keys in the business data:
 
 ```text
 --xargs l10n.inline.enabled=true
@@ -285,137 +338,128 @@ BASE=/tmp/luban-split-code-targets-acceptance scripts/accept-split-code-targets.
 --xargs l10n.inline.outputFileNameFormat=L-Localization-c-{table}.xlsx
 ```
 
-`l10n.inline.outputPath` 用于指定自动生成的本地化 `.xlsx` 文件目录，支持相对路径和绝对路径。相对路径以 Luban 进程的当前工作目录为基准，例如：
+`l10n.inline.outputPath` is the output directory of the generated `.xlsx` files. Both relative and absolute paths are supported; relative paths are resolved against the current working directory of the Luban process, for example:
 
 ```text
 --xargs l10n.inline.outputPath=/path/to/Config/Excels/Local/Generated
 ```
 
-`l10n.inline.outputFileNameFormat` 用于指定自动生成的本地化 `.xlsx` 文件名模板，默认 `{table}.xlsx`。模板支持占位符（均会做文件名安全清洗）：
-- `{table}`：业务表完整名。
-- `{source}`：源 xlsx 文件名（去扩展名）。
-- `{sourceDir}`：源 xlsx 所在目录的最后一段。
-- `{rawName}`：源文件名按 `-`/`_` 拆出的第二段（与 GameFrameXTableImporter 的 rawTableName 一致）。
-- `{comment}`：源文件名拆出的第三段及之后，用 `-` 拼接。
-- `{sheet}`：源 xlsx 内的 sheet 名（同一文件多 sheet 分表时区分用）；无 sheet 概念时为空。
+`l10n.inline.outputFileNameFormat` is the file name template of the generated `.xlsx` files and defaults to `{table}.xlsx`. Supported placeholders (all sanitized for file name safety):
 
-同一个表可能来自多个源文件或同一文件的多个 sheet（分表）。按 source 部件分组后计算文件名，模板未区分的组自动合并到同一输出文件：模板包含 `{source}`/`{sheet}` 等区分性占位符时按分表拆分，只含 `{table}` 时保持一表一文件。缺 source 时 `{source}` 退化到 `{table}`。需要输出文件名按 GameFrameX 命名约定（如 `L-Localization-c-{namespace}.{表名}-{中文注释}.xlsx`）时使用：
+- `{table}`: full business table name.
+- `{source}`: source xlsx file name without extension; falls back to the table name when no source exists.
+- `{sourceDir}`: last segment of the directory containing the source xlsx.
+- `{rawName}`: second segment of the source file name split by `-`/`_` (consistent with GameFrameXTableImporter's rawTableName).
+- `{comment}`: third and later segments of the source file name, joined by `-`.
+- `{sheet}`: sheet name inside the source xlsx (distinguishes sub-tables of one file); empty when the source has no sheet concept.
+
+One table may come from multiple source files or from multiple sheets of the same file (sub-tables). File names are computed per source group, and groups the template does not distinguish are merged into the same output file: a template containing `{source}`/`{sheet}` splits by sub-table, while a `{table}`-only template keeps one file per table. Use the following to follow the GameFrameX naming convention (`L-Localization-c-{namespace}.{tableName}-{comment}.xlsx`):
 
 ```text
 --xargs l10n.inline.outputFileNameFormat=L-Localization-c-{sourceDir}.{rawName}-{comment}.xlsx
 ```
 
-输入 `Tables/D-ItemConfig-道具表-道具.xlsx` → 输出 `L-Localization-c-Tables.ItemConfig-道具表-道具.xlsx`。
+Input `Tables/D-ItemConfig-道具表-道具.xlsx` → output `L-Localization-c-Tables.ItemConfig-道具表-道具.xlsx`.
 
-#### 重新生成时的合并语义
+##### Merge semantics on re-generation
 
-`l10n.inline.*` 生成的 `.xlsx` 文件**不会**被删除或整表覆盖，而是增量合并：
+The `.xlsx` files generated by `l10n.inline.*` are never deleted or overwritten wholesale; they are merged incrementally:
 
-- **现有 xlsx 已存在的 key**：`l10n.inline.languageFieldName` 指定的源语言列以业务表为准，value 变化时同步更新；其他语言列（译者填写的翻译）保持不变。
-- **业务表新增的 key**：以 inline 写入的默认 value 追加到文件末尾。
-- **业务表删除的 key**：文件里保留（不删）。
-- **用户手工加的 row**：保留。
-- **多语言列**：保留所有现有列；如 `l10n.inline.languageFieldName` 指定的列在现有文件里缺失，则在 metadata 中扩展该列。
-- **行顺序**：现有行严格保持原顺序；新追加的行追加到末尾。
-- **文件重写**：只有出现新 key、新语言列或源语言 value 变化时才重写 xlsx，内容无变化时文件保持不动；重写时单元格文本与 `##` 注释行保留，但样式信息（颜色、列宽、批注等）不会保留。
+- **Keys already present in the xlsx**: the source-language column named by `l10n.inline.languageFieldName` follows the business table and is updated when the value changes; other language columns (translator content) stay unchanged.
+- **Keys newly added to business tables**: appended to the end of the file with the inline default value.
+- **Keys removed from business tables**: kept in the file (not deleted).
+- **Rows added manually by users**: preserved.
+- **Language columns**: all existing columns are preserved; if the column named by `l10n.inline.languageFieldName` is missing in an existing file, it is extended in the metadata.
+- **Row order**: existing rows keep their exact order; new rows are appended at the end.
+- **File rewrite**: the xlsx is rewritten only when there are new keys, a new language column, or changed source-language values; otherwise the file is left untouched. A rewrite keeps cell text and `##` comment rows but drops styling (colors, column widths, comments, etc.).
 
-简单说：**只追加，不删、不重排；源语言列跟随业务表，其他语言列不覆盖**。第一次跑 inline 后，应该把生成目录当作翻译入口；后续每次跑只会追加新出现的 key 并同步源语言 value，已翻译的其他语言内容始终保留。
+In short: **append-only, no deletion, no reordering; the source-language column follows the business table, other language columns are never overwritten**. Treat the generated directory as the translation entry point after the first run: subsequent runs only append newly appearing keys and sync source-language values, while translated content in other languages is always kept.
 
-生成文件使用现有 Luban 表格式，保持原有元数据表头布局，数据行从 B 列开始填充（A 列为空），表头语言列为 `key | zh_CN`，文件扩展名为 `.xlsx`。外部人工本地化表优先于 inline value；inline key 在不同表中出现时 value 必须一致，合法空 value 会被保留。
+Generated files use the standard Luban table format, keep the original metadata header layout, fill data rows starting from column B (column A stays empty), use `key | zh_CN` as the header language columns, and use the `.xlsx` extension. External hand-maintained localization tables take precedence over inline values; an inline key must carry the same value across tables; valid empty values are preserved.
 
-### 增加自动导表的文件名称扩展识别
+#### File-name based automatic table import
 
-通过文件名约定自动注册配置表：表结构直接写在 xlsx 内，文件名携带排序前缀、表名、导出组与注释信息，配合目录结构自动推导命名空间，无需在 XML 中逐表声明。
+Tables are registered automatically through file name conventions: the table schema is defined inside the xlsx itself, and the file name carries the sort prefix, table name, export group, and comment. Together with the directory layout this also derives the namespace — no per-table XML declarations needed.
 
-#### 使用场景
+##### When to use
 
-- **免 schema 声明**：新增配置表时只需按命名规范新建 xlsx 文件，不必同步维护 XML 定义。
-- **目录即命名空间**：按模块分目录组织表格，自动映射为生成代码的命名空间。
-- **多文件分表协作**：同一张表的数据拆到多个文件，按文件名自动合并为一张表。
-- **按组过滤导出**：通过文件名中的组名（如 `s` 客户端 / `c` 服务端），同一套表仓按导出 target 输出不同子集。
+- **Schema-free table registration**: adding a config table only takes a new xlsx file named by convention; there is no XML definition to maintain in parallel.
+- **Directory as namespace**: organize tables into per-module folders and get the generated code namespaces for free.
+- **Multi-file sub-tables**: split one table's rows across several files; they are merged back into a single table by file name.
+- **Group-filtered export**: the group segment in the file name (e.g. `s` for client, `c` for server) lets one table repository serve different targets with different subsets.
 
-#### 导出参数(必须配置)
+##### Required export parameter
 
-```
+```text
 --xargs tableImporter.name=gameframex
 ```
 
-#### 说明
+##### Naming format
 
-格式 [任意字母]-[导出的表名称]-[导出的组名]-[表名称注释].xlsx
+`[any letter]-[table name]-[group]-[comment].xlsx`
 
-表格以任意字母-开头。
+- The file name starts with `any letter-`.
+- The table name segment is English without spaces; underscores are allowed.
+- The group segment must be one of the defined groups (`s` or `c`) and is optional.
+- The comment segment can be any length. Only the content between the first and second `-` is used, with `Tb` prefixed, as the final table name.
 
-中间部分的表名称为英文且不能有空格可以有下划线
+##### Examples
 
-导出的组名称必须是定义的`s`、 `c` 之一，可选
+Table names:
 
-后面表名称注释可以接任意长度。程序只取第一个`-` 和第二个`-` 之间的内容加上 `Tb` 为最终表名称。
+- `L-Localization.xlsx` => `Tb`Localization
+- `C-Achievement-成就表.xlsx` => `Tb`Achievement
+- `C-Achievement-成就表-AAA.xlsx` => `Tb`Achievement
+- `C-Achievement-成就表-AAA-BBB.xlsx` => `Tb`Achievement
+- `C-Achievement-成就表-AAA-BBB-CCC.xlsx` => `Tb`Achievement
 
-#### 示例
+Group names:
 
-##### 导出的表名称
+- `C-Achievement-s-成就表.xlsx` => `Tb`Achievement, exported only when the current export target is `s`
+- `C-Achievement-c-成就表-AAA.xlsx` => `Tb`Achievement, exported only when the current export target is `c`
+- `C-Achievement-s-成就表-AAA-BBB.xlsx` => `Tb`Achievement, exported only when the current export target is `s`
+- `C-Achievement-c-成就表-AAA-BBB-CCC.xlsx` => `Tb`Achievement, exported only when the current export target is `c`
 
-L-Localization.xlsx => `Tb`Localization
+##### Advanced options and behavior details
 
-C-Achievement-成就表.xlsx => `Tb`Achievement
+Besides `tableImporter.name=gameframex`, the following optional parameters are supported (all have defaults):
 
-C-Achievement-成就表-AAA.xlsx => `Tb`Achievement
+| Option | Default | Description |
+|:-------|:--------|:------------|
+| `tableImporter.filePattern` | `([a-zA-Z0-9]-.+)` | File name regex; the first capture group feeds the table name |
+| `tableImporter.tableNamespaceFormat` | `{0}` | Table namespace format |
+| `tableImporter.tableNameFormat` | `Tb{0}` | Table name format; `Tb` prefix by default |
+| `tableImporter.valueTypeNameFormat` | `{0}` | Value type name format |
 
-C-Achievement-成就表-AAA-BBB.xlsx => `Tb`Achievement
+- The data directory is scanned recursively for `xlsx` / `xls` / `xlsm` / `csv`; ignored files and configured exclude paths are skipped automatically.
+- **Directory as namespace**: the relative directory path is converted to `.`-separated form, split by `-` / `_`, and the first segment becomes the namespace.
+- **Multi-file merge (sub-tables)**: files sharing the same namespace and table name are merged into one table's input.
+- A table name (second segment) containing Chinese characters fails the build.
+- The group segment only takes effect when it matches a group defined in the configuration, and the table is exported only when the current target includes that group.
 
-C-Achievement-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement
+#### Exclude directories from import (`--excludePath`)
 
-##### 导出的组表名称
-
-C-Achievement-s-成就表.xlsx => `Tb`Achievement, 当前导出目标为 `s` 时才会导出
-
-C-Achievement-c-成就表-AAA.xlsx => `Tb`Achievement, 当前导出目标为 `c` 时才会导出
-
-C-Achievement-s-成就表-AAA-BBB.xlsx => `Tb`Achievement, 当前导出目标为 `s` 时才会导出
-
-C-Achievement-c-成就表-AAA-BBB-CCC.xlsx => `Tb`Achievement, 当前导出目标为 `c` 时才会导出
-
-#### 进阶配置与行为细节
-
-除 `tableImporter.name=gameframex` 外，还支持以下可选参数（均有默认值）：
-
-| 参数 | 默认值 | 说明 |
-|:-----|:-------|:-----|
-| `tableImporter.filePattern` | `([a-zA-Z0-9]-.+)` | 文件名匹配正则，第一个捕获组作为表名来源 |
-| `tableImporter.tableNamespaceFormat` | `{0}` | 表命名空间格式 |
-| `tableImporter.tableNameFormat` | `Tb{0}` | 表名格式，默认加 `Tb` 前缀 |
-| `tableImporter.valueTypeNameFormat` | `{0}` | 表值类型名格式 |
-
-- 递归扫描数据目录下所有 `xlsx` / `xls` / `xlsm` / `csv`，自动忽略约定规则的文件与配置的排除路径。
-- **目录即命名空间**：表所在相对目录路径转为 `.` 分隔后按 `-` / `_` 拆分，取第一段作为命名空间。
-- **多文件合并（分表）**：命名空间与表名都相同的多个文件，合并为同一张表的数据输入。
-- 表名（第二段）包含中文时构建直接报错。
-- 组名（第三段）只有命中配置中已定义的组时才生效，且仅当当前导出 target 包含该组时才会导出该表。
-
-### 增加导表排除目录参数 `--excludePath`
-
-配合文件名自动导表（`tableImporter.name=gameframex`）使用，扫描数据目录时跳过指定目录下的表格文件，可重复指定：
+Works with file-name based automatic table import (`tableImporter.name=gameframex`): table files under the given directories are skipped while scanning the data directory. The option can be repeated:
 
 ```text
 --excludePath Local --excludePath Test
 ```
 
-- 按「相对数据目录的路径」做前缀匹配，不区分大小写；`Local` 也会匹配 `LocalExtra/`。
-- 参数中的 `/` 会被统一转换为 `\`。Windows 下可写多级目录（如 `Local\UI\`）；macOS / Linux 下扫描得到的相对路径使用 `/`，只有不带分隔符的首层目录名（如 `Local`）能命中。
+- Matching is a case-insensitive prefix match against the path relative to the data directory; `Local` also matches `LocalExtra/`.
+- `/` in the value is converted to `\`. On Windows multi-level directories work (e.g. `Local\UI\`); on macOS / Linux the scanned relative paths use `/`, so only a top-level directory name without separators (e.g. `Local`) matches.
 
-### 增加枚举自动收集（autoExtend）能力
+#### Enum auto collection (autoExtend)
 
-新增 `autoExtend` 能力：当枚举标记为自动扩展时，构建过程会自动扫描所有引用该枚举的表数据，把未在定义中声明的值收集起来，作为正式枚举项加入。这样无需在 schema 中预先枚举所有取值，值随数据自然生长，最终生成的枚举代码会包含全部（预定义 + 自动收集）的枚举项。
+A new `autoExtend` capability is added: when an enum is marked as auto-extended, the build scans all table data referencing that enum, collects values not declared in the definition, and adds them as formal enum items. There is no need to enumerate all values in the schema up front — values grow naturally with the data, and the generated enum code contains both predefined and auto-collected items.
 
-#### 适用场景
+##### When to use
 
-- 枚举取值随业务数据持续增长，不希望每次都回头维护枚举定义。
-- 取值的"名字"比"数字"更重要（建议配合 json/字符串导出使用）。
+- Enum values keep growing with business data and you do not want to maintain the enum definition every time.
+- The "name" of a value matters more than its number (recommended together with json/string exports).
 
-#### 配置方式
+##### Configuration
 
-XML schema（专用属性）：
+XML schema (dedicated attribute):
 
 ```xml
 <enum name="Color" auto_extend="true">
@@ -424,50 +468,24 @@ XML schema（专用属性）：
 </enum>
 ```
 
-Excel schema（复用已有的 `tags` 列，无需新增列）：在 `__enums__` 中对应枚举行的 `tags` 列写入 `auto_extend` 或 `auto_extend=1` 即可启用。
+Excel schema (reuses the existing `tags` column; no new column needed): write `auto_extend` or `auto_extend=1` into the `tags` column of the enum's row in `__enums__` to enable it.
 
-#### 行为说明
+##### Behavior
 
-- 收集阶段在类型编译之后、代码生成与正式数据加载之前执行，生成的枚举代码会包含自动收集到的项。
-- 名字型未定义值（如 `PURPLE`）按字典序排序后顺序分配新的 int 值（`max(预定义项) + 1` 递增）。
-- 数字型未定义值（如 `42`）以 `AUTO_VALUE_42` 为名、保留该字面值。
-- 同一份输入数据下结果完全确定（与加载顺序无关）。
-- 自动收集的项会带 `auto=1` 标记，并在日志中输出新增项明细。
+- Collection runs after type compilation and before code generation and formal data loading; the generated enum code includes the auto-collected items.
+- Undefined name values (e.g. `PURPLE`) get new int values assigned in lexicographic order (incrementing from `max(predefined items) + 1`).
+- Undefined numeric values (e.g. `42`) keep the literal value and are named `AUTO_VALUE_42`.
+- Results are fully deterministic for the same input data (independent of loading order).
+- Auto-collected items are tagged `auto=1`, and the details of new items are printed to the log.
 
-#### 注意事项
+##### Notes
 
-- 自动收集项的 int 值由"当前数据集"决定，**数据增删可能导致已分配值变化**：binary 导出（按 int 编码）需特别留意，json/字符串导出（按名字编码）则不受影响。
-- 未启用 `auto_extend` 的枚举行为完全不变，遇到未定义值仍按原逻辑报错。
+- The int values of auto-collected items depend on the current data set — **adding or removing data may change the assigned values**. Binary exports (int-encoded) need extra care; json/string exports (name-encoded) are unaffected.
+- Enums without `auto_extend` behave exactly as before; undefined values still raise errors under the original logic.
 
-## Docker
+## Architecture
 
-Luban 提供 Docker 镜像，版本 tag 与 Git tag 保持一致，使用无 `v` 前缀的 SemVer 格式，例如 `3.13.1`；可用版本见 [Releases](https://github.com/GameFrameX/luban/releases)。镜像只包含主程序 `Luban`（`Luban.dll`），不含 `Luban.Agent` 与 `Luban.Mcp`。
-
-镜像地址：
-
-| Registry | Image |
-|:---------|:------|
-| Docker Hub | `docker.io/gameframex/gameframex-luban:<version>` |
-| GitHub Container Registry | `ghcr.io/gameframex/gameframex-luban:<version>` |
-| Aliyun Container Registry | `<ALIYUN_REGISTRY_URL>/<ALIYUN_NAMESPACE>/gameframex-luban:<version>` |
-
-示例：
-
-```bash
-docker run --rm docker.io/gameframex/gameframex-luban:<version> --help
-```
-
-在当前项目目录中运行 Luban 时，可以挂载工作目录：
-
-```bash
-docker run --rm -v "$PWD:/work" -w /work docker.io/gameframex/gameframex-luban:<version> --help
-```
-
-发布镜像只提供精确版本 tag，不提供 `latest`、`5`、`5.1` 等浮动 tag。
-
-## 生态架构
-
-GameFrameX 由以下仓库组成：构建期工具链生成协议与配置代码，运行时由游戏客户端、游戏服务器与运营后台协作。
+GameFrameX consists of the repositories below: the build-time toolchain generates protocol and config code, while game clients, game servers and the operations backend cooperate at runtime.
 
 ```mermaid
 %%{init: {"flowchart": {"curve": "linear", "nodeSpacing": 30, "rankSpacing": 50}}}%%
@@ -516,58 +534,78 @@ flowchart TB
     Runtime -- "data storage · NuGet packages" --> Infrastructure
 ```
 
-### 核心项目
+### Core Projects
 
-| 项目 | 作用 | 技术栈 | 产物与对接 |
+| Project | Role | Tech Stack | Integration |
 |------|------|------|------|
-| [Unity](https://github.com/GameFrameX/GameFrameX.Unity) | Unity 客户端工程：从 GameFrameX UPM 源按需组装 90+ 框架组件，HybridCLR 热更新，内置登录、背包、房间等示例 | Unity 2019.4.40+, HybridCLR, YooAsset, FairyGUI, UniTask | 消费 Protobuf / Config / FairyGUIProject 产物；TCP 29100 + HTTP 28080 连 Server，HTTP 20808 连 Admin Client API |
-| [Server](https://github.com/GameFrameX/GameFrameX.Server) | Actor 模型游戏服务器：Apps 持久化状态层与 Hotfix 可热更逻辑层严格分离，支持单进程与多进程部署 | .NET 10, MongoDB, Docker | 监听 TCP 29100 / WebSocket 29110 / HTTP 28080；为 Admin 提供邮件、发道具、玩家管理等 HTTP 管理接口 |
-| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | 多租户运营后台：Admin（20802）/ Client（20808）/ Hub（20806）三个 host + Vue 管理端，覆盖区服、公告、邮件、订单支付、远程配置、在线运营 | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | 按区服 `HttpManageUrl` 调用 Server；Client API 为游戏客户端提供全局信息、登录与支付回调 |
-| [luban](https://github.com/GameFrameX/luban) | Luban 配置工具的 GameFrameX 分支：合入官方 v5.1.0，增加 `gameframex` 表导入器与 `cs-dotnet-json` / `cs-dotnet-bin` 等生成目标 | .NET 10, Scriban | 发布 Luban tar.gz 与 Docker 镜像；每日同步进 Config 的 `Tools/` |
-| [Config](https://github.com/GameFrameX/GameFrameX.Config) | 配置表仓：Excel 数据表 + schema + 本地化表，一键脚本生成前后端代码与数据 | Excel, Luban | `gen-client-*` → Unity; `gen-server-json` → Server; `gen-server-bin` → Server.Source; `gen-godot-json` / `gen-cocos-json` / `gen-laya-json` → Godot / CocosCreator / LayaBox |
-| [Protobuf](https://github.com/GameFrameX/GameFrameX.Protobuf) | 统一网络协议定义：proto3，按文件名中的数字模块 ID 组织消息与错误码（正数为客户端↔服务器，负数为服务器内部） | proto3 | `Proto2CsExport_Server` → Server; `Proto2CsExport_Client` → Unity; `Proto2CsExport_Godot` / `Proto2TsExport_CocosCreator` / `Proto2TsExport_LayaBox` → 其他客户端；每次 push 由 CI 发布六种语言的 Release |
-| [Tools](https://github.com/GameFrameX/GameFrameX.Tools) | ProtoExport 协议代码生成器：C# / TypeScript / C++ / Lua / Go 五种语言，提供 CLI、Avalonia GUI 与 Docker 三种形态 | .NET 10, Avalonia 12 | `ProtoExport.dll` 每周同步进 Protobuf 的 `Tools/`；Docker 镜像 `gameframex/gameframex-tools` |
+| [Unity](https://github.com/GameFrameX/GameFrameX.Unity) | Unity client project: assembles 90+ framework packages from the GameFrameX UPM registry, HybridCLR hot update, login / bag / room samples | Unity 2019.4.40+, HybridCLR, YooAsset, FairyGUI, UniTask | Consumes Protobuf / Config / FairyGUIProject output; TCP 29100 + HTTP 28080 to Server, HTTP 20808 to Admin Client API |
+| [Server](https://github.com/GameFrameX/GameFrameX.Server) | Actor-model game server: persistent Apps state layer strictly separated from the hot-updatable Hotfix logic layer; single- or multi-process deployment | .NET 10, MongoDB, Docker | Listens on TCP 29100 / WebSocket 29110 / HTTP 28080; HTTP management endpoints (mail, item grants, player management) for Admin |
+| [Admin](https://github.com/GameFrameX/GameFrameX.Admin) | Multi-tenant operations backend: Admin (20802) / Client (20808) / Hub (20806) hosts + Vue console, covering game areas, announcements, mail, orders & payment, remote config, LiveOps | .NET 10, SqlSugar, PostgreSQL, Vue 3.5, PrimeVue | Calls Server through each game area's `HttpManageUrl`; Client API serves global info, login and payment callbacks to game clients |
+| [luban](https://github.com/GameFrameX/luban) | GameFrameX fork of Luban: merged upstream v5.1.0, adds the `gameframex` table importer and `cs-dotnet-json` / `cs-dotnet-bin` code targets | .NET 10, Scriban | Publishes Luban tar.gz and Docker image; synced daily into Config `Tools/` |
+| [Config](https://github.com/GameFrameX/GameFrameX.Config) | Config table repository: Excel data tables + schema + localization tables, one-click scripts generate client and server code and data | Excel, Luban | `gen-client-*` → Unity; `gen-server-json` → Server; `gen-server-bin` → Server.Source; `gen-godot-json` / `gen-cocos-json` / `gen-laya-json` → Godot / CocosCreator / LayaBox |
+| [Protobuf](https://github.com/GameFrameX/GameFrameX.Protobuf) | Unified network protocol definitions: proto3, messages and error codes grouped by the numeric module ID in each file name (positive = client↔server, negative = server-internal) | proto3 | `Proto2CsExport_Server` → Server; `Proto2CsExport_Client` → Unity; `Proto2CsExport_Godot` / `Proto2TsExport_CocosCreator` / `Proto2TsExport_LayaBox` → other clients; CI publishes a six-language Release on every push |
+| [Tools](https://github.com/GameFrameX/GameFrameX.Tools) | ProtoExport protocol code generator: C# / TypeScript / C++ / Lua / Go, available as CLI, Avalonia GUI and Docker image | .NET 10, Avalonia 12 | `ProtoExport.dll` synced weekly into Protobuf `Tools/`; Docker image `gameframex/gameframex-tools` |
 
-### 周边系统
+### Peripheral Systems
 
-| 项目 | 作用 | 技术栈 | 产物与对接 |
+| Project | Role | Tech Stack | Integration |
 |------|------|------|------|
-| [Foundation](https://github.com/GameFrameX/GameFrameX.Foundation) | 模块化 .NET 类库合集：本地化、JSON、命令行参数、日志、HTTP、加密、哈希、ORM 基类实体、幂等性 | .NET | 以 NuGet 包被 Server、Server.Source、Admin、Tools 引用 |
-| [SuperSocket](https://github.com/GameFrameX/GameFrameX.SuperSocket) | SuperSocket 的 GameFrameX 分支：.NET 10 构建目标、依赖注入支持、面向弱网游戏流量的 KCP / ReliableSession | .NET 10 | NuGet：Server（ClientEngine）、Server.Source（Server / Kcp / Udp / WebSocket） |
-| [Server.Source](https://github.com/GameFrameX/GameFrameX.Server.Source) | 框架层以源码形式放在仓内的服务器版本：服务发现、跨进程 RemoteMessaging（TCP / KCP）、多进程部署 | .NET 10, MongoDB, Docker | 接收 Config `gen-server-bin` 产物；`docker-compose.multi.yml` 多进程部署 |
-| [Godot](https://github.com/GameFrameX/GameFrameX.Godot) | Godot .NET 客户端：可复用运行时模块、编辑器插件、热更新程序集 | Godot 4.7, C# | Config `gen-godot-json`, Protobuf `Proto2CsExport_Godot`；TCP 29100 / WebSocket 29110 连 Server |
-| [CocosCreator](https://github.com/GameFrameX/GameFrameX.CocosCreator) | Cocos Creator 客户端，以 Unity 版为基准迁移 | Cocos Creator 3.8, TypeScript | `npm run gen:proto` / `gen:config` 调用 Protobuf / Config 脚本；WebSocket 连 Server |
-| [LayaBox](https://github.com/GameFrameX/GameFrameX.LayaBox) | LayaBox 客户端 | LayaAir, TypeScript | Config `gen-laya-json`, Protobuf `Proto2TsExport_LayaBox`；WebSocket 连 Server |
-| [FairyGUIProject](https://github.com/GameFrameX/GameFrameX.FairyGUIProject) | FairyGUI 编辑器工程：所有游戏界面的设计源文件 | FairyGUI Editor | 发布 UI 包到 Unity `Assets/Bundles/UI`，代码到 `Assets/Hotfix/UI/FairyGUI/` |
+| [Foundation](https://github.com/GameFrameX/GameFrameX.Foundation) | Modular .NET libraries: localization, JSON, command-line options, logging, HTTP, encryption, hashing, ORM base entities, idempotency | .NET | NuGet packages referenced by Server, Server.Source, Admin, Tools |
+| [SuperSocket](https://github.com/GameFrameX/GameFrameX.SuperSocket) | GameFrameX fork of SuperSocket: .NET 10 targets, dependency injection, KCP / ReliableSession for weak-network game traffic | .NET 10 | NuGet: Server (ClientEngine), Server.Source (Server / Kcp / Udp / WebSocket) |
+| [Server.Source](https://github.com/GameFrameX/GameFrameX.Server.Source) | Server variant with the framework as in-repo source: service discovery, cross-process RemoteMessaging (TCP / KCP), multi-process deployment | .NET 10, MongoDB, Docker | Receives Config `gen-server-bin` output; multi-process via `docker-compose.multi.yml` |
+| [Godot](https://github.com/GameFrameX/GameFrameX.Godot) | Godot .NET client with reusable runtime modules, editor plugins and hot-update assemblies | Godot 4.7, C# | Config `gen-godot-json`, Protobuf `Proto2CsExport_Godot`; TCP 29100 / WebSocket 29110 to Server |
+| [CocosCreator](https://github.com/GameFrameX/GameFrameX.CocosCreator) | Cocos Creator client, migrated from the Unity version | Cocos Creator 3.8, TypeScript | `npm run gen:proto` / `gen:config` calls Protobuf / Config scripts; WebSocket to Server |
+| [LayaBox](https://github.com/GameFrameX/GameFrameX.LayaBox) | LayaBox client | LayaAir, TypeScript | Config `gen-laya-json`, Protobuf `Proto2TsExport_LayaBox`; WebSocket to Server |
+| [FairyGUIProject](https://github.com/GameFrameX/GameFrameX.FairyGUIProject) | FairyGUI editor project: design source of all game UI | FairyGUI Editor | Publishes UI packages to Unity `Assets/Bundles/UI` and code to `Assets/Hotfix/UI/FairyGUI/` |
 
-## 文档
+## Dependencies
 
-- [官方文档](https://www.datable.cn/docs/intro)
-- [快速上手](https://www.datable.cn/docs/guide/install)
-- [AI 支持（Skills / Agent / MCP / schema-json）](https://www.datable.cn/docs/ai/overview)
-- [5.x 新特性（相对 4.x）](https://www.datable.cn/docs/other/whats-new)
-- **示例项目** ([github](https://github.com/focus-creative-games/luban_examples)) ([gitee](https://gitee.com/focus-creative-games/luban_examples))
+- Build and run: .NET 10 SDK (this fork targets `net10.0` everywhere).
+- Code generated by `cs-litjson` / `cs-litjson-split` depends on the GameFrameX LitJson package (`GameFrameX.LitJSON.Runtime`).
+- The GameFrameX runtime shape (`cs-bin` and friends) depends on the GameFrameX runtime libraries (`BaseDataTable<T>`, `Tables.Init(ConfigComponent)`, `LoadAsync`).
+- The other code targets introduce no additional runtime dependencies.
 
-仓库内 AI 资源见 [`ai/`](./ai/README.md)。
+## Documentation & Resources
 
-## 开发者：运行测试
+- [Official Documentation](https://www.datable.cn/en/docs/intro)
+- [Quick Start](https://www.datable.cn/en/docs/guide/install)
+- [AI support (Skills / Agent / MCP / schema-json)](https://www.datable.cn/en/docs/ai/overview)
+- [What's new in 5.x (vs 4.x)](https://www.datable.cn/en/docs/other/whats-new)
+- **Example Project** ([github](https://github.com/focus-creative-games/luban_examples)) ([gitee](https://gitee.com/focus-creative-games/luban_examples))
 
-主仓自带 xUnit 集成测试（不依赖外部 `luban_examples`）：
+AI assets in this repo: [`ai/`](./ai/README.md).
 
-```bash
-dotnet test src/Luban.Tests/Luban.Tests.csproj
-```
+## Community & Support
 
-- 夹具与期望输出：`tests/fixtures/`、`tests/golden/`
-- 刷新 golden（改导出行为后）：`pwsh tests/scripts/update-goldens.ps1` 或 `bash tests/scripts/update-goldens.sh`
-- 也可在跑测试时设置环境变量 `LUBAN_UPDATE_GOLDEN=1` 就地更新 golden
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/GameFrameX/gameframex)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/VDWUjWMDw9)
+[<img src="https://cdn.jsdelivr.net/npm/devicon@2/icons/linkedin/linkedin-original.svg" height="28" alt="LinkedIn" />](https://www.linkedin.com/in/alianblank)
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/GameFrameX/)
+[![X](https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/alian_blank)
+[![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/channel/UCD9QhSFJ5xZkn5NTSV-DVAw)
+[![Bluesky](https://img.shields.io/badge/Bluesky-0285FF?style=for-the-badge&logo=bluesky&logoColor=white)](https://bsky.app/profile/alianblank.bsky.social)
+[![Bilibili](https://img.shields.io/badge/Bilibili-00A1D6?style=for-the-badge&logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV1yrpeepEn7)
+[![Gitee](https://img.shields.io/badge/Gitee-C71D23?style=for-the-badge&logo=gitee&logoColor=white)](https://gitee.com/GameFrameX/gameframex)
+![QQ](https://img.shields.io/badge/QQ-467608841%2F233840761-EB1923?style=for-the-badge&logo=qq&logoColor=white)
 
-## 支持与联系
+Luban-specific support:
 
-- QQ群: 692890842 （Luban开发交流群）
-- discord: <https://discord.gg/dGY4zzGMJ4>
-- 邮箱: <luban@code-philosophy.com>
+- QQ group: 692890842 (Luban development exchange group)
+- Discord: <https://discord.gg/dGY4zzGMJ4>
+- Email: <luban@code-philosophy.com>
 
-## license
+## Changelog
 
-Luban is licensed under the [MIT](https://github.com/focus-creative-games/luban/blob/main/LICENSE) license
+See [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+See [LICENSE.md](LICENSE.md) for license information.
+
+<!--
+EN: See [LICENSE.md](LICENSE.md) for license information.
+zh-CN: 详见 [LICENSE.md](LICENSE.md) 文件。
+zh-TW: 詳見 [LICENSE.md](LICENSE.md) 檔案。
+ja: 詳しくは [LICENSE.md](LICENSE.md) をご参照ください。
+ko: 자세한 내용은 [LICENSE.md](LICENSE.md) 파일을 참조하세요.
+-->
