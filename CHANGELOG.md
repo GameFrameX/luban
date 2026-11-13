@@ -1,3 +1,19 @@
+## [5.1.1] - 2026-11-13
+
+### Bug Fixes
+
+* 兄弟目录探测 DLL 不再硬编码 net8.0
+
+### Documentation
+
+* 新增生态架构图和各项目说明表
+* LICENSE 重命名为 LICENSE.md
+* README 全面套用 GameFrameX 多语言标准
+
+### build
+
+* 发版自动附带三目录产物附件 (#23)
+* 发布产物显式传入计划版本号
 ## [5.1.0] - 2026-10-25
 
 ### Bug Fixes
