@@ -227,12 +227,7 @@ public static class LubanTools
         {
             return Path.GetFullPath(env);
         }
-        var candidates = new[]
-        {
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Luban.Agent", "bin", "Release", "net8.0", "Luban.Agent.dll")),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Luban.Agent", "bin", "Debug", "net8.0", "Luban.Agent.dll")),
-        };
-        return candidates.FirstOrDefault(File.Exists);
+        return FindSiblingDll("Luban.Agent", "Luban.Agent.dll");
     }
 
     private static string? ResolveLubanDll(string? overridePath)
@@ -246,12 +241,34 @@ public static class LubanTools
         {
             return Path.GetFullPath(env);
         }
-        var candidates = new[]
+        return FindSiblingDll("Luban", "Luban.dll");
+    }
+
+    private static string? FindSiblingDll(string projectName, string dllName)
+    {
+        var repoRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        var preferredTfm = $"net{Environment.Version.Major}.0";
+        foreach (var config in new[] { "Release", "Debug" })
         {
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Luban", "bin", "Release", "net8.0", "Luban.dll")),
-            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "Luban", "bin", "Debug", "net8.0", "Luban.dll")),
-        };
-        return candidates.FirstOrDefault(File.Exists);
+            var binDir = Path.Combine(repoRoot, projectName, "bin", config);
+            if (!Directory.Exists(binDir))
+            {
+                continue;
+            }
+            var preferred = Path.Combine(binDir, preferredTfm, dllName);
+            if (File.Exists(preferred))
+            {
+                return preferred;
+            }
+            var candidate = Directory.EnumerateFiles(binDir, dllName, SearchOption.AllDirectories)
+                .OrderByDescending(p => p, StringComparer.Ordinal)
+                .FirstOrDefault();
+            if (candidate != null)
+            {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     private static string? ResolveDocsRoot(string? overridePath)
